@@ -6,17 +6,18 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="apigat" />
         <module name="shared" />
+        <module name="apigat" />
         <module name="auth-service" />
         <module name="game-service" />
         <module name="lobby-service" />
-        <module name="user-service" />
+        <module name="userservice" />
         <module name="eureka-srv" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="demo" target="17" />
+      <module name="user-service" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
@@ -29,6 +30,7 @@
       <module name="lobby-service" options="-parameters" />
       <module name="shared" options="-parameters" />
       <module name="user-service" options="-parameters" />
+      <module name="userservice" options="-parameters" />
     </option>
   </component>
 </project>
