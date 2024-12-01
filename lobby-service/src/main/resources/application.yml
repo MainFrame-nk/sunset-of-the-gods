@@ -1,0 +1,20 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/  # URL Eureka Server
+  instance:
+    prefer-ip-address: true
+server:
+  port: 8083
+
+spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+  application:
+    name: LobbyService
+
+jwt:
+  secret: U7512_nG32Eu&261hJp-aSd-KjaaDcbQ
