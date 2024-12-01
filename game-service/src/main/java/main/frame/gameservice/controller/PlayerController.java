@@ -22,14 +22,18 @@ public class PlayerController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createPlayer(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<String> createPlayer(@RequestBody UserDTO userDTO) {
      //   playerService.createPlayer(request.getUserId(), request.getLobbyId());
-        playerService.createPlayer(userDTO);
-        return ResponseEntity.ok().build();
+        try {
+            playerService.createPlayer(userDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Игрок успешно зарегистрирован!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка при создании игрока!");
+        }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PlayerDTO> getPlayerById(@PathVariable Long id) {
+    public ResponseEntity<PlayerDTO> findById(@PathVariable Long id) {
         try {
             Optional<PlayerDTO> optionalPlayer = playerService.getById(id);
             return optionalPlayer

@@ -2,7 +2,7 @@ package main.frame.lobbyservice.service;
 
 import main.frame.lobbyservice.dto.request.JoinLobbyRequest;
 import main.frame.lobbyservice.dto.response.CreateLobbyDTO;
-import main.frame.lobbyservice.dto.response.LobbyDTO;
+import main.frame.shared.dto.LobbyDTO;
 import main.frame.lobbyservice.dto.response.LobbyPlayerDTO;
 import main.frame.lobbyservice.model.Lobby;
 import main.frame.lobbyservice.model.LobbyStatus;
@@ -12,13 +12,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface LobbyService {
-    public LobbyDTO getLobbyById(Long lobbyId);
+    public Optional<LobbyDTO> getLobbyById(Long lobbyId);
     List<LobbyDTO> getAllLobbies(LobbyStatus status);
     public void removePlayerFromLobby(Long lobbyId, Long playerId, Long requestorId);
     //private void transferHostToNextPlayer(Long lobbyId)
    // public void cleanupInactiveLobbies(); // Удалить неактивные лобби
-    public Lobby createLobby(CreateLobbyDTO createLobbyDTO);
-    public void deleteLobby(Long lobbyId);
+    public void createLobby(CreateLobbyDTO createLobbyDTO);
+    public boolean deleteLobby(Long lobbyId);
    // public void closeLobby(Long lobbyId);
     public LobbyDTO updateLobby(Long lobbyId, Long hostId, String name, String password, int maxPlayers);
     public LobbyPlayerDTO joinToLobby(JoinLobbyRequest request);
@@ -30,7 +30,6 @@ public interface LobbyService {
     public LobbyDTO setMaxPlayers(Long lobbyId, int maxPlayers);
     public void updatePlayerStatus(Long lobbyId, Long userId, LobbyUserStatus status);
     public List<LobbyDTO> filterLobbies(Optional<Integer> minPlayers, Optional<Integer> maxPlayers, Optional<String> gameMode);
-    public Lobby createPrivateLobby(String name, String password, Long hostId);
     public Lobby connectToPrivateLobby(JoinLobbyRequest request, String password);
   //  public void inviteUserToLobby(Long lobbyId, Long userId);
   //  public Lobby acceptInvitation(Long lobbyId, Long userId);

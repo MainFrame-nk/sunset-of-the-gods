@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import main.frame.lobbyservice.dto.response.LobbyDTO;
+import main.frame.shared.dto.LobbyDTO;
 
 @Data
 @NoArgsConstructor
@@ -48,11 +48,11 @@ public class Lobby {
     public LobbyDTO toLobbyDTO() {
         return new LobbyDTO(
                 this.id,
-                this.name,
-                this.maxPlayers,
-                this.status,
-         //       this.password,
-                this.hostId
+                this.name
+//                this.maxPlayers,
+//                this.status,
+//         //       this.password,
+//                this.hostId
         );
     }
 

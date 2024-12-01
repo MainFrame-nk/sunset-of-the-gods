@@ -1,6 +1,6 @@
-package main.frame.game.service;
+package main.frame.authservice.service;
 
-import main.frame.game.utils.JwtUtil;
+import main.frame.authservice.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;

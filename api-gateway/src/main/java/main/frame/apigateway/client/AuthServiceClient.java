@@ -1,11 +1,10 @@
-package main.frame.apigat.client;
+package main.frame.apigateway.client;
 
 //import main.frame.shared.dto.UserDTO;
 
-import main.frame.apigat.dto.request.LoginRequest;
-import main.frame.apigat.dto.request.RegisterRequest;
+import main.frame.apigateway.dto.request.LoginRequest;
+import main.frame.apigateway.dto.request.RegisterRequest;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;

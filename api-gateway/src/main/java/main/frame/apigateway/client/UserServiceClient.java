@@ -1,7 +1,6 @@
-package main.frame.apigat.client;
+package main.frame.apigateway.client;
 
-import main.frame.apigat.dto.request.ChangePasswordRequest;
-import main.frame.shared.dto.RoleDTO;
+import main.frame.apigateway.dto.request.ChangePasswordRequest;
 import main.frame.shared.dto.UserDTO;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.core.ParameterizedTypeReference;
@@ -9,9 +8,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;

@@ -1,4 +1,4 @@
-package main.frame.game.utils;
+package main.frame.authservice.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

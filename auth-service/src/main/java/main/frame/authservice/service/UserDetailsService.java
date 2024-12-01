@@ -1,11 +1,10 @@
-package main.frame.game.service;
+package main.frame.authservice.service;
 
-import main.frame.game.client.UserServiceClient;
+import main.frame.authservice.client.UserServiceClient;
 //import main.frame.game.model.Role;
 //import main.frame.game.model.User;
 import main.frame.shared.dto.RoleDTO;
 import main.frame.shared.dto.UserDTO;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

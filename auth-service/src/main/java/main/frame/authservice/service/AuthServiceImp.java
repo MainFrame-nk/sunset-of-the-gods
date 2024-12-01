@@ -1,24 +1,16 @@
-package main.frame.game.service;
+package main.frame.authservice.service;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import main.frame.game.client.UserServiceClient;
-import main.frame.game.dto.request.RegisterRequest;
-import main.frame.game.utils.JwtUtil;
+import main.frame.authservice.client.UserServiceClient;
+import main.frame.authservice.dto.request.RegisterRequest;
+import main.frame.authservice.utils.JwtUtil;
 import main.frame.shared.dto.UserDTO;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 @Service
 @Slf4j

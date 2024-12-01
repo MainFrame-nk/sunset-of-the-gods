@@ -1,7 +1,5 @@
-package main.frame.game.config;
+package main.frame.authservice.config;
 
-import main.frame.game.dto.response.JwtResponse;
-import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

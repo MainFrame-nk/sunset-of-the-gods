@@ -1,4 +1,4 @@
-package main.frame.game.dto.request;
+package main.frame.authservice.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

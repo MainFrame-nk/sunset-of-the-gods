@@ -1,4 +1,4 @@
-package main.frame.game;
+package main.frame.authservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

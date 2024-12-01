@@ -1,4 +1,4 @@
-package main.frame.apigat.dto.request;
+package main.frame.apigateway.dto.request;
 
 
 import jakarta.validation.constraints.Email;

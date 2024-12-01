@@ -1,6 +1,6 @@
-package main.frame.game.service;
+package main.frame.authservice.service;
 
-import main.frame.game.dto.request.RegisterRequest;
+import main.frame.authservice.dto.request.RegisterRequest;
 import main.frame.shared.dto.UserDTO;
 
 public interface AuthService {

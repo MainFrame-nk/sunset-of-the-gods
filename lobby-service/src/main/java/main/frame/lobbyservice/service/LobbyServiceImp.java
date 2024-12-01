@@ -1,6 +1,7 @@
 package main.frame.lobbyservice.service;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
 import main.frame.lobbyservice.client.GameServiceClient;
@@ -10,17 +11,19 @@ import main.frame.lobbyservice.dto.request.JoinLobbyRequest;
 import main.frame.lobbyservice.dto.request.LeaveLobbyRequest;
 import main.frame.lobbyservice.dto.request.UpdatePlayerStatusRequest;
 import main.frame.lobbyservice.dto.response.CreateLobbyDTO;
-import main.frame.lobbyservice.dto.response.LobbyDTO;
+import main.frame.shared.dto.LobbyDTO;
 import main.frame.lobbyservice.dto.response.LobbyPlayerDTO;
 import main.frame.lobbyservice.model.Lobby;
 import main.frame.lobbyservice.model.LobbyPlayer;
 import main.frame.lobbyservice.model.LobbyStatus;
 import main.frame.lobbyservice.model.LobbyUserStatus;
 import main.frame.shared.dto.PlayerDTO;
+import main.frame.shared.dto.UserDTO;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -272,7 +275,7 @@ public class LobbyServiceImp implements LobbyService{
 
     @Transactional
     @Override
-    public Lobby createLobby(CreateLobbyDTO createLobbyDTO) {
+    public void createLobby(CreateLobbyDTO createLobbyDTO) {
         if (createLobbyDTO.getHostId() == null) {
             throw new IllegalArgumentException("Host ID обязателен для создания лобби.");
         }
@@ -292,24 +295,7 @@ public class LobbyServiceImp implements LobbyService{
         lobby.setHostId(createLobbyDTO.getHostId());
 
         entityManager.persist(lobby);
-        return lobby;
-    }
-
-    @Transactional
-    @Override
-    public Lobby createPrivateLobby(String name, String password, Long hostId) {
-        Lobby lobby = new Lobby();
-        lobby.setHostId(hostId);
-        lobby.setName(name);
-        lobby.setStatus(LobbyStatus.WAITING);
-        lobby.setPassword(password);
-        lobby.setMaxPlayers(6);
-//        lobby.setCreatedAt(LocalDateTime.now());
-//        lobby.setUpdatedAt(LocalDateTime.now());
-
-        entityManager.persist(lobby);
-
-        return lobby;
+     //   log.info("Лобби успешно создано: {}", lobby.getName());
     }
 
     @Transactional
@@ -333,7 +319,7 @@ public class LobbyServiceImp implements LobbyService{
 
    // @Transactional
     @Override
-    public void deleteLobby(Long lobbyId) {
+    public boolean deleteLobby(Long lobbyId) {
         // Удаляем всех игроков, связанных с лобби
         entityManager.createQuery("DELETE FROM LobbyPlayer lp WHERE lp.lobbyId = :lobbyId")
                 .setParameter("lobbyId", lobbyId)
@@ -343,8 +329,10 @@ public class LobbyServiceImp implements LobbyService{
         Lobby lobby = entityManager.find(Lobby.class, lobbyId);
         if (lobby != null) {
             entityManager.remove(lobby);
+            return true;
         } else {
-            throw new IllegalArgumentException("Лобби не найдено.");
+          //  log.error("Ошибка! Лобби не найдено!");
+            return false;
         }
     }
 
@@ -371,6 +359,25 @@ public class LobbyServiceImp implements LobbyService{
         return lobby.toLobbyDTO();
     }
 
+//    @Override
+//    public List<LobbyDTO> searchLobbies(String name) {
+//        StringBuilder queryBuilder = new StringBuilder("SELECT DISTINCT u FROM Lobby u WHERE 1=1");
+//
+//        // Добавляем условия только для ненулевых параметров
+//        if (name != null && !name.isEmpty()) {
+//            queryBuilder.append(" AND LOWER(u.name) LIKE :name");
+//        }
+//
+//        TypedQuery<Lobby> query = entityManager.createQuery(queryBuilder.toString(), Lobby.class);
+//
+//        // Устанавливаем параметры только для ненулевых значений
+//        if (name != null && !name.isEmpty()) {
+//            query.setParameter("name", "%" + name.toLowerCase() + "%");
+//        }
+//
+//        return query.getResultList().stream().map(Lobby::toLobbyDTO).toList();
+//    }
+
 //    public void inviteUserToLobby(Long lobbyId, Long userId) {
 ////        if (!isUserHost(lobbyId, hostId)) {
 ////            throw new SecurityException("Только хост может приглашать игроков в лобби.");
@@ -396,12 +403,14 @@ public class LobbyServiceImp implements LobbyService{
 
 
     @Override
-    public LobbyDTO setMaxPlayers(Long lobbyId, int maxPlayers) {
+    public Lobby setMaxPlayers(Long lobbyId, int maxPlayers) {
         if (maxPlayers < 2 || maxPlayers > 6) {
             throw new IllegalArgumentException("Игроков может быть не меньше 2 и не больше 6.");
         }
 
-        LobbyDTO lobby = getLobbyById(lobbyId);
+        Lobby lobby = getLobbyById(lobbyId)
+                .orElseThrow(() -> new EntityNotFoundException("Лобби с ID " + lobbyId + " не найдено."));
+
         lobby.setMaxPlayers(maxPlayers);
         //updateLobby(lobbyId);
 
@@ -647,17 +656,22 @@ public class LobbyServiceImp implements LobbyService{
             return entityManager.createQuery("SELECT l FROM Lobby l", LobbyDTO.class)
                     .getResultList();
         }
+//        return entityManager.createQuery("SELECT u FROM User u", User.class)
+//                .getResultList().stream()
+//                .map(User::toUserDTO)
+//                .sorted(Comparator.comparing(UserDTO::getId))
+//                .collect(Collectors.toList());
     }
 
 
     @Override
-    public LobbyDTO getLobbyById(Long lobbyId) {
-        LobbyDTO lobby = entityManager.find(LobbyDTO.class, lobbyId);
+    public Optional<LobbyDTO> getLobbyById(Long lobbyId) {
+        Lobby lobby = entityManager.find(Lobby.class, lobbyId);
         if (lobby == null) {
             throw new IllegalArgumentException("Лобби не найдено.");
         }
 
-        return lobby;
+        return Optional.of(lobby.toLobbyDTO());
     }
 
     public List<LobbyDTO> filterLobbies(Optional<Integer> minPlayers, Optional<Integer> maxPlayers, Optional<String> gameMode) {

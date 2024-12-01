@@ -1,4 +1,4 @@
-package main.frame.game.dto.request;
+package main.frame.authservice.dto.request;
 
 
 import lombok.Data;
@@ -7,7 +7,6 @@ import main.frame.shared.dto.RoleDTO;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 @Data

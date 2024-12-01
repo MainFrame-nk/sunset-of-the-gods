@@ -1,10 +1,10 @@
-package main.frame.apigat.controller;
+package main.frame.apigateway.controller;
 
 
 import lombok.AllArgsConstructor;
-import main.frame.apigat.client.AuthServiceClient;
-import main.frame.apigat.dto.request.LoginRequest;
-import main.frame.apigat.dto.request.RegisterRequest;
+import main.frame.apigateway.client.AuthServiceClient;
+import main.frame.apigateway.dto.request.LoginRequest;
+import main.frame.apigateway.dto.request.RegisterRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

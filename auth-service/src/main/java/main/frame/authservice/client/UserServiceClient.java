@@ -1,6 +1,6 @@
-package main.frame.game.client;
+package main.frame.authservice.client;
 
-import main.frame.game.dto.request.RegisterRequest;
+import main.frame.authservice.dto.request.RegisterRequest;
 import main.frame.shared.dto.UserDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;

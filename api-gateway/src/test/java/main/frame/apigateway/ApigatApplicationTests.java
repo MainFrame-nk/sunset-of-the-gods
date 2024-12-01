@@ -1,4 +1,4 @@
-package main.frame.apigat;
+package main.frame.apigateway;
 
 //import org.junit.jupiter.api.Test;
 //import org.springframework.boot.test.context.SpringBootTest;

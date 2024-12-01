@@ -1,4 +1,4 @@
-package main.frame.game.config;
+package main.frame.authservice.config;
 
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;

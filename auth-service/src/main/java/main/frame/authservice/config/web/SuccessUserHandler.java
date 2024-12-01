@@ -1,4 +1,4 @@
-package main.frame.game.config.web;
+package main.frame.authservice.config.web;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

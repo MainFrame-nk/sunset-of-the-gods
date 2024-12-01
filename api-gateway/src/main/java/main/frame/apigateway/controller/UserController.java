@@ -1,20 +1,13 @@
-package main.frame.apigat.controller;
+package main.frame.apigateway.controller;
 
 import lombok.AllArgsConstructor;
-import main.frame.apigat.client.AuthServiceClient;
-import main.frame.apigat.client.UserServiceClient;
-import main.frame.apigat.dto.request.ChangePasswordRequest;
-import main.frame.apigat.dto.request.RegisterRequest;
-import main.frame.shared.dto.RoleDTO;
+import main.frame.apigateway.client.UserServiceClient;
+import main.frame.apigateway.dto.request.ChangePasswordRequest;
 import main.frame.shared.dto.UserDTO;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;

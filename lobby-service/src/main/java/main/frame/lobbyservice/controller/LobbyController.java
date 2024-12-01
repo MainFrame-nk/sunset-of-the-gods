@@ -2,13 +2,18 @@ package main.frame.lobbyservice.controller;
 
 import main.frame.lobbyservice.dto.request.JoinLobbyRequest;
 import main.frame.lobbyservice.dto.response.CreateLobbyDTO;
-import main.frame.lobbyservice.dto.response.LobbyDTO;
+import main.frame.lobbyservice.model.LobbyStatus;
+import main.frame.shared.dto.LobbyDTO;
 import main.frame.lobbyservice.model.Lobby;
 import main.frame.lobbyservice.service.LobbyService;
+import main.frame.shared.dto.UserDTO;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/lobby")
@@ -20,39 +25,29 @@ public class LobbyController {
         this.lobbyService = lobbyService;
     }
 
-//    @PostMapping("/create")
-//    public ResponseEntity<Lobby> createLobby(@RequestParam String name,
-//                                             @RequestParam String password,
-//                                             @RequestParam Integer maxPlayers,
-//                                             @RequestParam Long hostId) {
-//        Lobby lobby = lobbyService.createLobby(name, password, maxPlayers, hostId);
-//        return ResponseEntity.ok(lobby);
-//    }
-
-    @PostMapping("/create")
-    public ResponseEntity<Lobby> createLobby(@RequestBody @Valid CreateLobbyDTO createLobbyDTO) {
-        Lobby lobby = lobbyService.createLobby(createLobbyDTO);
-        return ResponseEntity.ok(lobby);
+    @GetMapping("/")
+    public ResponseEntity<List<LobbyDTO>> getAllLobbies(@RequestBody LobbyStatus status) {
+        try {
+            List<LobbyDTO> lobbies = lobbyService.getAllLobbies(status);
+            if (lobbies.isEmpty()) {
+                return ResponseEntity.noContent().build(); // Возвращаем 204, если список пуст
+            }
+            return ResponseEntity.ok(lobbies);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
+        }
     }
 
-//    @PostMapping("/register")
-//    public ResponseEntity<String> createUser(@RequestBody RegisterRequest registerRequest) {
-//        userService.createUser(registerRequest);
-//        return ResponseEntity.ok("User registered successfully");
-//    }
-
-    //    @GetMapping("/user")
-//    public ResponseEntity<UserDTO> getUserDetails(@AuthenticationPrincipal UserDetails userDetails) {
-//        System.out.println("UserDetails: " + userDetails); // Логируем полученные данные
-//        Optional<User> optionalUser = userService.findByEmail(userDetails.getUsername());
-//        if (optionalUser.isPresent()) {
-//            UserDTO userDTO = optionalUser.get().toUserDTO();
-//            return ResponseEntity.ok(userDTO);
-//        } else {
-//            System.out.println("User not found: " + userDetails.getUsername());
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-//        }
-//    }
+    @PostMapping("/create")
+    public ResponseEntity<String> createLobby(@RequestBody @Valid CreateLobbyDTO createLobbyDTO) {
+        try {
+            lobbyService.createLobby(createLobbyDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Лобби успешно создано!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка при создании лобби!");
+        }
+    }
 
     @PostMapping("/{lobbyId}/join")
     public ResponseEntity<Void> joinLobby(@RequestBody JoinLobbyRequest request) {
@@ -66,28 +61,47 @@ public class LobbyController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{lobbyId}")
-    public ResponseEntity<LobbyDTO> getLobby(@PathVariable Long lobbyId) {
-        LobbyDTO lobby = lobbyService.getLobbyById(lobbyId);
-        return lobby != null ? ResponseEntity.ok(lobby) : ResponseEntity.notFound().build();
+    @GetMapping("/{id}")
+    public ResponseEntity<LobbyDTO> findById(@PathVariable Long id) {
+        try {
+            Optional<LobbyDTO> optionalLobby = lobbyService.getLobbyById(id);
+            return optionalLobby
+                    .map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body(null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
+        }
     }
 
-    // Удаление пользователя по ID
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
-//        boolean isDeleted = userService.deleteUser(id);
-//        if (isDeleted) {
-//            return ResponseEntity.ok("User deleted successfully");
-//        } else {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-//        }
-//    }
-//
-//    // Обновление данных пользователя
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteLobby(@PathVariable Long id) {
+        try {
+            boolean isDeleted = lobbyService.deleteLobby(id);
+            if (isDeleted) {
+                return ResponseEntity.ok("Пользователь успешно удален.");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Пользователь с указанным ID не найден.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Ошибка при удалении пользователя.");
+        }
+    }
+
 //    @PutMapping("/{id}")
-//    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
-//        Optional<UserDTO> updatedUser = userService.updateUser(id, userDTO);
-//        return updatedUser.map(ResponseEntity::ok)
-//                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+//    public ResponseEntity<LobbyDTO> updateLobby(@PathVariable Long id, @RequestBody LobbyDTO lobbyDTO) {
+//        try {
+//            Optional<LobbyDTO> updatedLobby = lobbyService.updateLobby(id, lobbyDTO);
+//            return updatedLobby
+//                    .map(ResponseEntity::ok)
+//                    .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+//                            .body(null)); // Возвращаем пустое тело в случае ошибки
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(null);
+//        }
 //    }
 }

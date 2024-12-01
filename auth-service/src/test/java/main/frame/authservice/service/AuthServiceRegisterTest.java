@@ -1,14 +1,11 @@
-package main.frame.game.service;
+package main.frame.authservice.service;
 
 //import main.frame.game.dto.UserDTO;
-import main.frame.game.model.Role;
-import main.frame.game.model.User;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import main.frame.authservice.model.Role;
+import main.frame.authservice.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 
 import static org.assertj.core.api.Assertions.assertThat;

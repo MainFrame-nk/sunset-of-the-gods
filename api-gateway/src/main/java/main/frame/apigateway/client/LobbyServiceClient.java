@@ -1,10 +1,7 @@
-package main.frame.apigat.client;
+package main.frame.apigateway.client;
 
-import main.frame.apigat.dto.request.CreateLobbyRequest;
-import main.frame.apigat.dto.request.LoginRequest;
-import main.frame.apigat.dto.request.RegisterRequest;
+import main.frame.apigateway.dto.request.CreateLobbyRequest;
 import main.frame.shared.dto.LobbyDTO;
-import main.frame.shared.dto.UserDTO;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -13,8 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @Service
 public class LobbyServiceClient {

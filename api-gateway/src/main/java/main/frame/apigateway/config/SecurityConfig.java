@@ -1,7 +1,7 @@
-package main.frame.apigat.config;
+package main.frame.apigateway.config;
 
-import main.frame.apigat.filter.JwtAuthenticationFilter;
-import main.frame.apigat.filter.TokenPresenceFilter;
+import main.frame.apigateway.filter.JwtAuthenticationFilter;
+import main.frame.apigateway.filter.TokenPresenceFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

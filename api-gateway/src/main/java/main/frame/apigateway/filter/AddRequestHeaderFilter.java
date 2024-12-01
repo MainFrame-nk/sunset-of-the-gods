@@ -1,10 +1,4 @@
-package main.frame.apigat.filter;
-
-import org.springframework.cloud.gateway.filter.GatewayFilter;
-import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
-import org.springframework.stereotype.Component;
-
-import java.util.UUID;
+package main.frame.apigateway.filter;
 
 //@Component
 //public class AddRequestHeaderFilter extends AbstractGatewayFilterFactory<AddRequestHeaderFilter.Config> {

@@ -1,4 +1,4 @@
-package main.frame.game.config;
+package main.frame.authservice.config;
 
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;

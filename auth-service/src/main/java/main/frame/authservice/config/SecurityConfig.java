@@ -1,8 +1,8 @@
-package main.frame.game.config;
+package main.frame.authservice.config;
 
 import lombok.AllArgsConstructor;
-import main.frame.game.filter.JwtRequestFilter;
-import main.frame.game.utils.JwtUtil;
+import main.frame.authservice.filter.JwtRequestFilter;
+import main.frame.authservice.utils.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,7 +11,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import main.frame.game.service.UserDetailsService;
+import main.frame.authservice.service.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;

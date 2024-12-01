@@ -1,22 +1,14 @@
-package main.frame.game.controller;
+package main.frame.authservice.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import main.frame.game.client.UserServiceClient;
-import main.frame.game.dto.response.JwtResponse;
-import main.frame.game.dto.request.LoginRequest;
-import main.frame.game.dto.request.RegisterRequest;
+import main.frame.authservice.dto.response.JwtResponse;
+import main.frame.authservice.dto.request.LoginRequest;
+import main.frame.authservice.dto.request.RegisterRequest;
 import main.frame.shared.dto.UserDTO;
-import main.frame.game.service.AuthService;
+import main.frame.authservice.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import main.frame.game.utils.JwtUtil;
-
-
-import java.util.Optional;
 
 @RestController
 @Slf4j
