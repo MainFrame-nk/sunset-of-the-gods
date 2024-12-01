@@ -1,0 +1,10 @@
+server:
+  port: 8761  # Порт, на котором будет работать Eureka
+
+eureka:
+  client:
+    register-with-eureka: false  # Сам сервер не регистрируется в Eureka
+    fetch-registry: false  # Он не получает информацию о других клиентах
+  server:
+    enable-self-preservation: false
+    wait-time-in-ms-when-sync-empty: 0
