@@ -2,9 +2,7 @@ package main.frame.gameservice.model.characters;
 
 import jakarta.persistence.*;
 import lombok.*;
-import main.frame.gameservice.model.Card;
-
-import java.util.Set;
+import main.frame.gameservice.model.cardconfig.Card;
 
 @Data
 @Entity

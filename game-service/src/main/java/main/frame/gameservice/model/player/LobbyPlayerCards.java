@@ -1,9 +1,9 @@
-package main.frame.gameservice.model;
+package main.frame.gameservice.model.player;
 
 import jakarta.persistence.*;
 import lombok.*;
 import main.frame.gameservice.dto.LobbyPlayerCardsDTO;
-import main.frame.gameservice.dto.PlayerDTO;
+import main.frame.gameservice.model.cardconfig.BaseCard;
 import main.frame.gameservice.model.characters.CharacterCard;
 import main.frame.gameservice.model.characters.CompanionCard;
 import main.frame.gameservice.model.effects.Ability;

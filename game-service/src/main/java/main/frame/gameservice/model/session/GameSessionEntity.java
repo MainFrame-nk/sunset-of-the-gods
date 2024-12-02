@@ -1,10 +1,11 @@
-package main.frame.gameservice.model;
+package main.frame.gameservice.model.session;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import main.frame.gameservice.model.player.Player;
 
 import java.util.List;
 

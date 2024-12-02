@@ -1,4 +1,4 @@
-package main.frame.gameservice.model;
+package main.frame.gameservice.model.session;
 
 public enum ActionType {
     PLAY_CARD,  // Разыграть карту

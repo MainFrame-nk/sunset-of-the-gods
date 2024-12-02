@@ -1,4 +1,4 @@
-package main.frame.gameservice.model;
+package main.frame.gameservice.model.player;
 
 import jakarta.persistence.*;
 import lombok.*;

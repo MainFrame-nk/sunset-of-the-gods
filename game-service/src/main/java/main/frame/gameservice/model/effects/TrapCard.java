@@ -3,7 +3,7 @@ package main.frame.gameservice.model.effects;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;
-import main.frame.gameservice.model.BaseCard;
+import main.frame.gameservice.model.cardconfig.BaseCard;
 
 @EqualsAndHashCode(callSuper = true)
 @Data

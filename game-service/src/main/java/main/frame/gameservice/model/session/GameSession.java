@@ -1,6 +1,7 @@
-package main.frame.gameservice.model;
+package main.frame.gameservice.model.session;
 
 import lombok.Data;
+import main.frame.gameservice.model.cardconfig.Card;
 import main.frame.shared.dto.PlayerDTO;
 
 import java.util.ArrayList;

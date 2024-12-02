@@ -2,7 +2,7 @@ package main.frame.gameservice.model.effects;
 
 import jakarta.persistence.*;
 import lombok.*;
-import main.frame.gameservice.model.BaseCard;
+import main.frame.gameservice.model.cardconfig.BaseCard;
 
 import java.util.HashSet;
 import java.util.Set;

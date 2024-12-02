@@ -4,12 +4,21 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import main.frame.gameservice.model.*;
-import main.frame.gameservice.model.effects.Effect;
+import main.frame.gameservice.client.LobbyServiceClient;
+import main.frame.gameservice.model.cardconfig.RestrictedCard;
+import main.frame.gameservice.model.characters.CharacterCard;
+import main.frame.gameservice.model.player.Player;
+import main.frame.gameservice.model.player.PlayerAction;
+import main.frame.gameservice.model.session.GamePhase;
+import main.frame.gameservice.model.session.GameSession;
+import main.frame.gameservice.model.session.GameSessionEntity;
+import main.frame.shared.dto.LobbyDTO;
 import main.frame.shared.dto.PlayerDTO;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,40 +27,61 @@ import java.util.stream.Collectors;
 public class GameServiceImp {
     @PersistenceContext
     private EntityManager entityManager;
-
+    private final LobbyServiceClient lobbyServiceClient;
     private final CardService cardService;
 
-    public boolean tryUseCard(Player player, Card card) {
-        if (player.canUseCard(card, cardService)) {
-            // Логика для использования карты
-            return true;
-        } else {
-            // Логика для ошибки, если карта не может быть использована
-            return false;
+//    public boolean tryUseCard(Player player, Card card) {
+//        if (player.canUseCard(card, cardService)) {
+//            // Логика для использования карты
+//            return true;
+//        } else {
+//            // Логика для ошибки, если карта не может быть использована
+//            return false;
+//        }
+//    }
+
+    public boolean canPlayerUseCard(Player player, RestrictedCard card) {
+        Set<String> playerClasses = player.getCharacterClasses()
+                .stream()
+                .map(CharacterCard::getName)
+                .collect(Collectors.toSet());
+
+        // Проверяем "разрешённые" классы
+        if (!card.getAllowedClasses().isEmpty() &&
+                Collections.disjoint(playerClasses, card.getAllowedClasses())) {
+            return false; // Игрок не может использовать карту
         }
+
+        // Проверяем "запрещённые" классы
+        if (!card.getRestrictedClasses().isEmpty() &&
+                !Collections.disjoint(playerClasses, card.getRestrictedClasses())) {
+            return false; // Игрок не может использовать карту
+        }
+
+        return true; // Ограничений нет
     }
 
-    public void applyEffect(Effect effect, Player player) {
-        switch (effect.getEffectType()) {
-            case INCREASE_DAMAGE:
-                player.setDamage(player.getDamage() + effect.getValue());
-                break;
-            case HEAL:
-                player.setHealth(Math.min(player.getMaxHealth(), player.getHealth() + effect.getValue()));
-                break;
-            case GAIN_LEVEL:
-                player.setLevel(player.getLevel() + 1);
-                break;
-            case IMMUNITY:
-                player.addStatus("IMMUNE");
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown effect type: " + effect.getEffectType());
-        }
-    }
+//    public void applyEffect(Effect effect, Player player) {
+//        switch (effect.getEffectType()) {
+//            case INCREASE_DAMAGE:
+//                player.setDamage(player.getDamage() + effect.getValue());
+//                break;
+//            case HEAL:
+//                player.setHealth(Math.min(player.getMaxHealth(), player.getHealth() + effect.getValue()));
+//                break;
+//            case GAIN_LEVEL:
+//                player.setLevel(player.getLevel() + 1);
+//                break;
+//            case IMMUNITY:
+//                player.addStatus("IMMUNE");
+//                break;
+//            default:
+//                throw new IllegalArgumentException("Unknown effect type: " + effect.getEffectType());
+//        }
+//    }
 
     public GameSession startGameSession(Long lobbyId) {
-        LobbyDTO lobby = lobbyService.getLobbyById(lobbyId)
+        LobbyDTO lobby = lobbyServiceClient.getLobbyById(lobbyId)
                 .orElseThrow(() -> new IllegalArgumentException("Лобби не найдено!"));
 
         GameSession session = new GameSession();

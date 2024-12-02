@@ -136,6 +136,10 @@ public class LobbyServiceImp implements LobbyService{
             throw new IllegalStateException("Игрок уже находится в лобби.");
         }
 
+        if (!lobby.getPassword().equals(request.getPassword())) {
+            throw new SecurityException("Неверный пароль.");
+        }
+
         // Добавляем игрока
         LobbyPlayer lobbyPlayer = new LobbyPlayer();
         lobbyPlayer.setLobbyId(lobbyId);
@@ -171,38 +175,15 @@ public class LobbyServiceImp implements LobbyService{
         return lobbyPlayer.toLobbyPlayerDTO();
     }
 
-    // Присоединение к лобби
-    public void joinLobby(JoinLobbyRequest request) {
-        // Логика добавления игрока в лобби
-        System.out.println("Игрок с ID " + request.getPlayerId() + " присоединился к лобби " + request.getLobbyId());
-
-        // Отправка сообщения через RabbitMQ
-        rabbitTemplate.convertAndSend(
-                RabbitMQConfig.EXCHANGE,
-                RabbitMQConfig.LOBBY_EVENTS_ROUTING_KEY,
-                request
-        );
-    }
-
-    // Выход из лобби
-    public void leaveLobby(LeaveLobbyRequest request) {
-        System.out.println("Игрок с ID " + request.getPlayerId() + " покинул лобби " + request.getLobbyId());
-        rabbitTemplate.convertAndSend(
-                RabbitMQConfig.EXCHANGE,
-                RabbitMQConfig.LOBBY_EVENTS_ROUTING_KEY,
-                request
-        );
-    }
-
     // Обновление статуса игрока
-    public void updatePlayerStatus(UpdatePlayerStatusRequest request) {
-        System.out.println("Игрок с ID " + request.getPlayerId() + " изменил статус в лобби " + request.getLobbyId());
-        rabbitTemplate.convertAndSend(
-                RabbitMQConfig.EXCHANGE,
-                RabbitMQConfig.LOBBY_EVENTS_ROUTING_KEY,
-                request
-        );
-    }
+//    public void updatePlayerStatus(UpdatePlayerStatusRequest request) {
+//        System.out.println("Игрок с ID " + request.getPlayerId() + " изменил статус в лобби " + request.getLobbyId());
+//        rabbitTemplate.convertAndSend(
+//                RabbitMQConfig.EXCHANGE,
+//                RabbitMQConfig.LOBBY_EVENTS_ROUTING_KEY,
+//                request
+//        );
+//    }
 
     public long countPlayersInLobby(Long lobbyId) {
         String query = "SELECT COUNT(lp) FROM LobbyPlayer lp WHERE lp.lobbyId = :lobbyId";
@@ -298,25 +279,6 @@ public class LobbyServiceImp implements LobbyService{
      //   log.info("Лобби успешно создано: {}", lobby.getName());
     }
 
-    @Transactional
-    @Override
-    public Lobby connectToPrivateLobby(JoinLobbyRequest request, String password) {
-        Lobby lobby = entityManager.find(Lobby.class, request.getLobbyId());
-        if (lobby == null) {
-            throw new IllegalArgumentException("Лобби не найдено.");
-        }
-
-        if (!lobby.getPassword().equals(password)) {
-            throw new SecurityException("Неверный пароль.");
-        }
-
-        joinToLobby(request);
-
-        return lobby;
-    }
-
-
-
    // @Transactional
     @Override
     public boolean deleteLobby(Long lobbyId) {
@@ -388,13 +350,13 @@ public class LobbyServiceImp implements LobbyService{
 //        rabbitTemplate.convertAndSend("lobby-invitations", invitation);
 //    }
 
-    public boolean isPlayerHost(Long lobbyId, Long userId) {
+    public boolean isPlayerHost(Long lobbyId, Long playerId) {
         Lobby lobby = entityManager.find(Lobby.class, lobbyId);
         if (lobby == null) {
             throw new IllegalArgumentException("Лобби не найдено.");
         }
 
-        return lobby.getHostId().equals(userId);
+        return lobby.getHostId().equals(playerId);
     }
 
 //    private void notifyPlayerKicked(Long userId, Long lobbyId) {
@@ -402,21 +364,21 @@ public class LobbyServiceImp implements LobbyService{
 //    }
 
 
-    @Override
-    public Lobby setMaxPlayers(Long lobbyId, int maxPlayers) {
-        if (maxPlayers < 2 || maxPlayers > 6) {
-            throw new IllegalArgumentException("Игроков может быть не меньше 2 и не больше 6.");
-        }
-
-        Lobby lobby = getLobbyById(lobbyId)
-                .orElseThrow(() -> new EntityNotFoundException("Лобби с ID " + lobbyId + " не найдено."));
-
-        lobby.setMaxPlayers(maxPlayers);
-        //updateLobby(lobbyId);
-
-        entityManager.merge(lobby);
-        return lobby;
-    }
+//    @Override
+//    public Lobby setMaxPlayers(Long lobbyId, int maxPlayers) {
+//        if (maxPlayers < 2 || maxPlayers > 6) {
+//            throw new IllegalArgumentException("Игроков может быть не меньше 2 и не больше 6.");
+//        }
+//
+//        Lobby lobby = getLobbyById(lobbyId)
+//                .orElseThrow(() -> new EntityNotFoundException("Лобби с ID " + lobbyId + " не найдено."));
+//
+//        lobby.setMaxPlayers(maxPlayers);
+//        //updateLobby(lobbyId);
+//
+//        entityManager.merge(lobby);
+//        return lobby;
+//    }
 
 //    public void recordGameStatistics(Long lobbyId, GameResult result) {
 //        Lobby lobby = getLobbyById(lobbyId);
@@ -497,7 +459,7 @@ public class LobbyServiceImp implements LobbyService{
             // Отправка события в RabbitMQ
             notifyGameStarted(lobbyId);
         } else {
-            throw new IllegalStateException("Cannot start the game: either not found or already started");
+            throw new IllegalStateException("Невозможно начать игру! Ошибка! Возможно игра уже начата!");
         }
 
         entityManager.merge(lobby);
@@ -545,27 +507,37 @@ public class LobbyServiceImp implements LobbyService{
     }
 
     @Override
-    public void disconnectPlayerFromLobby(Long lobbyId, Long userId) {
-        List<LobbyPlayerDTO> players = getPlayersInLobby(lobbyId);
+    public void disconnectPlayerFromLobby(LeaveLobbyRequest request) {
+        List<LobbyPlayerDTO> players = getPlayersInLobby(request.getLobbyId());
 
         LobbyPlayerDTO disconnectedPlayer = players.stream()
-                .filter(player -> player.getPlayerId().equals(userId))
+                .filter(player -> player.getPlayerId().equals(request.getPlayerId()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Игрок не найден в лобби."));
 
         players.remove(disconnectedPlayer);
 
         if (disconnectedPlayer.getStatus() == LobbyUserStatus.IN_TURN) {
-            endTurn(lobbyId, userId); // Завершаем ход отключенного игрока
+            endTurn(request.getLobbyId(), request.getPlayerId()); // Завершаем ход отключенного игрока
         }
 
-        if (players.size() < 2) {
+        if (players.isEmpty()) {
             //closeLobby(lobbyId); // Закрываем лобби, если игроков меньше двух
-            deleteLobby(lobbyId);
+            deleteLobby(request.getLobbyId());
         }
+
+        leaveLobby(request);
     }
 
-
+    // Выход из лобби
+    public void leaveLobby(LeaveLobbyRequest request) {
+        System.out.println("Игрок с ID " + request.getPlayerId() + " покинул лобби " + request.getLobbyId());
+        rabbitTemplate.convertAndSend(
+                RabbitMQConfig.EXCHANGE,
+                RabbitMQConfig.LOBBY_EVENTS_ROUTING_KEY,
+                request
+        );
+    }
 
     //@Transactional
     public void updateLobbyPlayer(LobbyPlayerDTO lobbyPlayer) {

@@ -1,4 +1,4 @@
-package main.frame.gameservice.model;
+package main.frame.gameservice.model.cardconfig;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

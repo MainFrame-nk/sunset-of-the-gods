@@ -2,7 +2,7 @@ package main.frame.gameservice.listener;
 
 import main.frame.gameservice.config.RabbitMQConfig;
 import main.frame.gameservice.dto.PlayerDTO;
-import main.frame.gameservice.model.GameSession;
+import main.frame.gameservice.model.session.GameSession;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 

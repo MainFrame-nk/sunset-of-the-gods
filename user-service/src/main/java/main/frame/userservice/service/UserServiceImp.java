@@ -285,9 +285,9 @@ public class UserServiceImp implements UserService {
         return userOptional.map(User::toUserDTO);  // Предполагается, что у User есть метод toUserDTO
     }
 
-    public boolean userExists(Long userId) {
-        return userRepository.existsById(userId);
-    }
+//    public boolean userExists(Long userId) {
+//        return userRepository.existsById(userId);
+//    }
 
 
 //    public UserDTO getUserDTOByEmail(String email) {

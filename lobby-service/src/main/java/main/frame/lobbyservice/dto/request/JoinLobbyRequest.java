@@ -8,5 +8,5 @@ import lombok.Data;
 public class JoinLobbyRequest {
     private Long lobbyId;
     private Long playerId;
-
+    private String password;
 }

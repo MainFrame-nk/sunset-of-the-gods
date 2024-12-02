@@ -78,18 +78,6 @@ public class GameController {
 //                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
 //    }
 //
-//    @PutMapping("/{id}/roles")
-//    public ResponseEntity<UserDTO> updateUserRoles(
-//            @PathVariable Long id,
-//            @RequestBody List<String> roles) {
-//        Optional<UserDTO> updatedUser = userService.updateUserRoles(id, roles);
-//
-//        // Если обновление не удалось, возвращаем ошибку 400
-//        return updatedUser.map(ResponseEntity::ok)
-//                .orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                .body(null));
-//
-//    }
 //
 //    // Получение всех пользователей
 //    @GetMapping("/")

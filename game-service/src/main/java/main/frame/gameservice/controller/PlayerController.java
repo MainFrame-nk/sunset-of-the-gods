@@ -1,13 +1,11 @@
 package main.frame.gameservice.controller;
 
-import main.frame.gameservice.model.Player;
 import main.frame.gameservice.service.PlayerService;
 import main.frame.shared.dto.PlayerDTO;
 import main.frame.shared.dto.UserDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 

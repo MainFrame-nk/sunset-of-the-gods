@@ -2,9 +2,7 @@ package main.frame.gameservice.model.equipment;
 
 import jakarta.persistence.*;
 import lombok.*;
-import main.frame.gameservice.model.BaseCard;
-
-import java.util.Set;
+import main.frame.gameservice.model.cardconfig.BaseCard;
 
 @EqualsAndHashCode(callSuper = true)
 @Data

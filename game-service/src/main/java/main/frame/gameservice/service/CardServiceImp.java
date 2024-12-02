@@ -3,15 +3,7 @@ package main.frame.gameservice.service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import main.frame.gameservice.model.Card;
-import main.frame.gameservice.model.Player;
-import main.frame.gameservice.model.RestrictedCard;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class CardServiceImp implements CardService {

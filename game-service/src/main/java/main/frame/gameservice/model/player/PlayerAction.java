@@ -1,9 +1,10 @@
-package main.frame.gameservice.model;
+package main.frame.gameservice.model.player;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import main.frame.gameservice.model.session.ActionType;
 
 @Data
 @NoArgsConstructor

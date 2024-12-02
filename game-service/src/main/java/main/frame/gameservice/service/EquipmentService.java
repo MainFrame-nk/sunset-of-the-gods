@@ -1,10 +1,10 @@
 package main.frame.gameservice.service;
 
-import main.frame.gameservice.model.*;
 import main.frame.gameservice.model.equipment.ArmorCard;
 import main.frame.gameservice.model.equipment.BodyCard;
 import main.frame.gameservice.model.equipment.HeadCard;
 import main.frame.gameservice.model.equipment.LegCard;
+import main.frame.gameservice.model.player.Player;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,11 +1,9 @@
 package main.frame.gameservice.service;
 
 import main.frame.shared.dto.PlayerDTO;
-import main.frame.gameservice.model.Player;
+import main.frame.gameservice.model.player.Player;
 import main.frame.shared.dto.UserDTO;
 
-import java.security.Principal;
-import java.util.List;
 import java.util.Optional;
 
 public interface PlayerService {

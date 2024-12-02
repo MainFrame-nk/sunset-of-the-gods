@@ -1,4 +1,4 @@
-package main.frame.gameservice.model;
+package main.frame.gameservice.model.cardconfig;
 
 import java.util.Set;
 

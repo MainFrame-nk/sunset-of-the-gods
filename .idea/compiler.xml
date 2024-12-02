@@ -10,12 +10,12 @@
         <module name="auth-service" />
         <module name="game-service" />
         <module name="lobby-service" />
-        <module name="api-gateway" />
         <module name="user-service" />
         <module name="eureka-srv" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="api-gateway" target="17" />
       <module name="demo" target="17" />
     </bytecodeTargetLevel>
   </component>

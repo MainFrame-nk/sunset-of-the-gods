@@ -219,11 +219,11 @@ public class UserController {
         }
     }
 
-    @GetMapping("/{userId}/exists")
-    public ResponseEntity<Boolean> checkUserExists(@PathVariable Long userId) {
-        boolean exists = userService.userExists(userId);
-        return ResponseEntity.ok(exists);
-    }
+//    @GetMapping("/{userId}/exists")
+//    public ResponseEntity<Boolean> checkUserExists(@PathVariable Long userId) {
+//        boolean exists = userService.userExists(userId);
+//        return ResponseEntity.ok(exists);
+//    }
 
 //    @GetMapping("/test-user")
 //    public ResponseEntity<String> testEndpoint(@RequestHeader Map<String, String> headers) {

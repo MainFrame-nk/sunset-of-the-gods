@@ -1,4 +1,4 @@
-package main.frame.gameservice.model;
+package main.frame.gameservice.model.session;
 
 public enum GamePhase {
     PREPARATION,  // Подготовка (раздача карт)
