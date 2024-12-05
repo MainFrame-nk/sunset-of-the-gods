@@ -20,8 +20,9 @@ public class GameSession {
     private GamePhase phase; // Текущая фаза игры
     private int turnNumber; // Номер текущего хода
 
+    // Начальная настройка игры
     public void initialize() {
-        // Начальная настройка игры
+        shufflePlayers(); // Случайное определение очередности ходов
         this.playerHands = new HashMap<>();
         for (PlayerDTO player : players) {
             List<Card> initialCards = dealCards(5); // Раздача 5 карт каждому игроку
@@ -29,29 +30,30 @@ public class GameSession {
         }
         this.deck = createDeck(); // Создать колоду
         this.discardPile = new ArrayList<>();
-        this.activePlayerId = players.get(0).getId(); // Первый игрок начинает
+        this.activePlayerId = turnOrder.get(0); // Первый игрок начинает
         this.phase = GamePhase.START;
         this.turnNumber = 1;
     }
 
+    // Случайное определение очередности игроков
+    private void shufflePlayers() {
+        Collections.shuffle(players);
+        this.turnOrder = players.stream()
+                .map(PlayerDTO::getId)
+                .collect(Collectors.toList());
+    }
+
+    // Переход хода к следующему игроку
     public void nextTurn() {
-        // Переход хода к следующему игроку
-        int currentIndex = players.indexOf(getActivePlayer());
-        int nextIndex = (currentIndex + 1) % players.size();
-        this.activePlayerId = players.get(nextIndex).getId();
+        int currentIndex = turnOrder.indexOf(activePlayerId);
+        int nextIndex = (currentIndex + 1) % turnOrder.size();
+        this.activePlayerId = turnOrder.get(nextIndex);
         this.turnNumber++;
         this.phase = GamePhase.PLAY;
     }
 
-    private PlayerDTO getActivePlayer() {
-        return players.stream()
-                .filter(player -> player.getId().equals(activePlayerId))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Активный игрок не найден!"));
-    }
-
+    // Логика раздачи карт
     private List<Card> dealCards(int count) {
-        // Логика раздачи карт
         List<Card> dealtCards = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             if (!deck.isEmpty()) {
@@ -61,9 +63,24 @@ public class GameSession {
         return dealtCards;
     }
 
+    // Создание начальной колоды
     private List<Card> createDeck() {
-        // Генерация колоды карт
-        return new ArrayList<>(); // Здесь можно добавить карты в колоду
+        return new ArrayList<>(); // Логика генерации карт
+    }
+
+    // Перемещение карты в сброс
+    public void discardCard(Long playerId, Card card) {
+        if (playerHands.get(playerId).remove(card)) {
+            discardPile.add(card);
+        } else {
+            throw new IllegalStateException("Карта не найдена у игрока!");
+        }
+    }
+
+    // Проверка завершения игры
+    public boolean isGameOver() {
+        // Логика определения завершения игры
+        return false; // Пример: возвращайте true, если есть победитель
     }
 }
 

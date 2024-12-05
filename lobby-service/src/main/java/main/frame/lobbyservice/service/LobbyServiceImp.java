@@ -466,26 +466,26 @@ public class LobbyServiceImp implements LobbyService{
     }
 
    // @Transactional
-    @Override
-    public void endTurn(Long lobbyId, Long userId) {
-        List<LobbyPlayerDTO> players = getPlayersInLobby(lobbyId);
-
-        LobbyPlayerDTO currentPlayer = players.stream()
-                .filter(player -> player.getPlayerId().equals(userId))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Игрок не найден в лобби."));
-
-        // Проверяем, что это ход текущего игрока
-        if (!currentPlayer.getTurnOrder().equals(getCurrentTurnIndex(players))) {
-            throw new IllegalStateException("Сейчас не ход данного игрока.");
-        }
-
-        // Определяем следующего игрока
-        int nextTurnOrder = (currentPlayer.getTurnOrder() + 1) % players.size();
-        setCurrentTurnIndex(players, nextTurnOrder);
-
-     //   notifyNextPlayerTurn(players.get(nextTurnOrder).getPlayerId(), lobbyId);
-    }
+//    @Override
+//    public void endTurn(Long lobbyId, Long userId) {
+//        List<LobbyPlayerDTO> players = getPlayersInLobby(lobbyId);
+//
+//        LobbyPlayerDTO currentPlayer = players.stream()
+//                .filter(player -> player.getPlayerId().equals(userId))
+//                .findFirst()
+//                .orElseThrow(() -> new IllegalStateException("Игрок не найден в лобби."));
+//
+//        // Проверяем, что это ход текущего игрока
+//        if (!currentPlayer.getTurnOrder().equals(getCurrentTurnIndex(players))) {
+//            throw new IllegalStateException("Сейчас не ход данного игрока.");
+//        }
+//
+//        // Определяем следующего игрока
+//        int nextTurnOrder = (currentPlayer.getTurnOrder() + 1) % players.size();
+//        setCurrentTurnIndex(players, nextTurnOrder);
+//
+//     //   notifyNextPlayerTurn(players.get(nextTurnOrder).getPlayerId(), lobbyId);
+//    }
 
     private int getCurrentTurnIndex(List<LobbyPlayerDTO> players) {
         return players.stream()
@@ -517,9 +517,9 @@ public class LobbyServiceImp implements LobbyService{
 
         players.remove(disconnectedPlayer);
 
-        if (disconnectedPlayer.getStatus() == LobbyUserStatus.IN_TURN) {
-            endTurn(request.getLobbyId(), request.getPlayerId()); // Завершаем ход отключенного игрока
-        }
+//        if (disconnectedPlayer.getStatus() == LobbyUserStatus.IN_TURN) {
+//            endTurn(request.getLobbyId(), request.getPlayerId()); // Завершаем ход отключенного игрока
+//        }
 
         if (players.isEmpty()) {
             //closeLobby(lobbyId); // Закрываем лобби, если игроков меньше двух

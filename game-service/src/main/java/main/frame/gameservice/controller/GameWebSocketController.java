@@ -1,9 +1,6 @@
-package main.frame.lobbyservice.controller;
+package main.frame.gameservice.controller;
 
-import main.frame.lobbyservice.dto.request.JoinLobbyRequest;
-import main.frame.lobbyservice.dto.response.LobbyPlayerDTO;
-import main.frame.lobbyservice.dto.response.LobbyStatusUpdate;
-import main.frame.lobbyservice.service.LobbyService;
+import main.frame.gameservice.service.GameService;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -13,13 +10,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @MessageMapping("/lobby") // Общий префикс для обработки сообщений
-public class LobbyWebSocketController {
+public class GameWebSocketController {
 
-    private final LobbyService lobbyService;
+    private final GameService gameService;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public LobbyWebSocketController(LobbyService lobbyService, SimpMessagingTemplate messagingTemplate) {
-        this.lobbyService = lobbyService;
+    public GameWebSocketController(GameService gameService, SimpMessagingTemplate messagingTemplate) {
+        this.gameService = gameService;
         this.messagingTemplate = messagingTemplate;
     }
 
@@ -61,9 +58,11 @@ public class LobbyWebSocketController {
         }
     }
 
-    @MessageMapping("/lobby/status")
-    @SendTo("/topic/lobby")
-    public LobbyStatusUpdate updateLobbyStatus(LobbyStatusUpdate statusUpdate) {
-        return statusUpdate; // Рассылаем обновления статуса лобби
+    @MessageMapping("/game/turn")
+    @SendTo("/topic/game")
+    public GameTurnUpdate processGameTurn(GameTurnUpdate turnUpdate) {
+        // Обрабатываем действие игрока
+        return turnUpdate;
     }
+
 }

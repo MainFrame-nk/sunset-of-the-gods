@@ -2,10 +2,12 @@ package main.frame.lobbyservice.controller;
 
 import main.frame.lobbyservice.dto.request.JoinLobbyRequest;
 import main.frame.lobbyservice.dto.response.LobbyPlayerDTO;
+import main.frame.lobbyservice.dto.response.LobbyStatusUpdate;
 import main.frame.lobbyservice.service.LobbyService;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -57,5 +59,11 @@ public class LobbyWebSocketController {
                     ex.getMessage()
             );
         }
+    }
+
+    @MessageMapping("/lobby/status")
+    @SendTo("/topic/lobby")
+    public LobbyStatusUpdate updateLobbyStatus(LobbyStatusUpdate statusUpdate) {
+        return statusUpdate; // Рассылаем обновления статуса лобби
     }
 }

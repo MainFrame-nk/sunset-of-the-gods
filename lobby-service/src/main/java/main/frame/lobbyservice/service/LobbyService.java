@@ -27,7 +27,7 @@ public interface LobbyService {
     void disconnectPlayerFromLobby(LeaveLobbyRequest request);
     List<LobbyPlayerDTO> getPlayersInLobby(Long lobbyId); // Получить игроков в лобби
     void startGame(Long lobbyId, Long hostId);
-    void endTurn(Long lobbyId, Long userId);
+   // void endTurn(Long lobbyId, Long userId);
    // LobbyDTO setMaxPlayers(Long lobbyId, int maxPlayers);
     void updatePlayerStatus(Long lobbyId, Long userId, LobbyUserStatus status);
     List<LobbyDTO> filterLobbies(Optional<Integer> minPlayers, Optional<Integer> maxPlayers, Optional<String> gameMode);

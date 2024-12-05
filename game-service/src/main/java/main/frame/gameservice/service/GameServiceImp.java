@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class GameServiceImp {
+public class GameServiceImp implements GameService {
     @PersistenceContext
     private EntityManager entityManager;
     private final LobbyServiceClient lobbyServiceClient;
@@ -39,6 +39,43 @@ public class GameServiceImp {
 //            return false;
 //        }
 //    }
+
+    public void initializeGameSession(Long lobbyId, List<Long> playerIds) {
+        GameSessionEntity session = new GameSessionEntity();
+        session.setLobbyId(lobbyId);
+
+        // Установка начальной очередности игроков
+        List<Long> shuffledOrder = new ArrayList<>(playerIds);
+        Collections.shuffle(shuffledOrder);
+        session.setTurnOrder(shuffledOrder);
+
+        session.setActivePlayerIndex(0); // Первый игрок начинает
+        session.setTurnNumber(1); // Первый ход
+        session.setPhase(GamePhase.START);
+
+        gameSessionRepository.save(session);
+    }
+
+    public void nextTurn(Long sessionId) {
+        GameSessionEntity session = gameSessionRepository.findById(sessionId)
+                .orElseThrow(() -> new IllegalArgumentException("Сессия не найдена"));
+
+        // Переход к следующему игроку
+        int currentIndex = session.getActivePlayerIndex();
+        int nextIndex = (currentIndex + 1) % session.getTurnOrder().size();
+
+        session.setActivePlayerIndex(nextIndex);
+        session.setTurnNumber(session.getTurnNumber() + 1);
+
+        // Установка фазы игры
+        session.setPhase(GamePhase.PLAY);
+
+        gameSessionRepository.save(session);
+
+        // Уведомление игроков через WebSocket
+        notifyPlayersAboutTurnChange(session);
+    }
+
 
     public boolean canPlayerUseCard(Player player, RestrictedCard card) {
         Set<String> playerClasses = player.getCharacterClasses()
@@ -93,7 +130,7 @@ public class GameServiceImp {
         return session;
     }
 
-    private void saveGameSession(GameSession session) {
+    public void saveGameSession(GameSession session) {
         GameSessionEntity entity = new GameSessionEntity();
         entity.setLobbyId(session.getLobbyId());
         entity.setPlayers(session.getPlayers());
@@ -174,7 +211,7 @@ public class GameServiceImp {
     }
 
 
-    private void playCard(GameSession session, Long playerId, Long cardId) {
+    public void playCard(GameSession session, Long playerId, Long cardId) {
         // Логика разыгрывания карты
         System.out.println("Игрок " + playerId + " разыгрывает карту " + cardId);
         // Убрать карту из руки игрока и выполнить эффект карты
@@ -191,7 +228,7 @@ public class GameServiceImp {
 //    }
 
 
-    private void discardCard(GameSession session, Long playerId, Long cardId) {
+    public void discardCard(GameSession session, Long playerId, Long cardId) {
         // Логика сброса карты
         System.out.println("Игрок " + playerId + " сбрасывает карту " + cardId);
         // Убрать карту из руки и добавить в сброс
@@ -226,7 +263,7 @@ public class GameServiceImp {
         return mapEntityToSession(entity);
     }
 
-    private void saveGameSession(GameSession session) {
+    public void saveGameSession(GameSession session) {
         GameSessionEntity entity = mapSessionToEntity(session);
         entityManager.merge(entity);
     }
@@ -260,7 +297,7 @@ public class GameServiceImp {
         return player.getLevel() >= 10; // Победа, если игрок достиг уровня 10
     }
 
-    private void endGame(GameSessionEntity session, Long winnerId) {
+    public void endGame(GameSessionEntity session, Long winnerId) {
         session.setActive(false); // Завершаем сессию
         session.setWinnerId(winnerId);
 

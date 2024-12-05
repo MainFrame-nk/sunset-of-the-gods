@@ -37,7 +37,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws") // Точка подключения WebSocket
+        registry.addEndpoint("/ws-lobby") // Точка подключения WebSocket
                 .setAllowedOrigins("*") // Разрешённые источники
                 .withSockJS(); // Поддержка SockJS для совместимости
     }
