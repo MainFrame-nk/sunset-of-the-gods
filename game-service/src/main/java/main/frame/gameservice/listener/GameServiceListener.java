@@ -1,8 +1,8 @@
 package main.frame.gameservice.listener;
 
 import main.frame.gameservice.config.RabbitMQConfig;
-import main.frame.gameservice.dto.PlayerDTO;
-import main.frame.gameservice.model.session.GameSession;
+import main.frame.gameservice.dto.SimplePlayerDTO;
+import main.frame.gameservice.model.session.GameSessionDTO;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
@@ -33,33 +33,33 @@ public class GameServiceListener {
         System.out.println("Старт игровой сессии: " + lobbyId);
 
         // Получаем игроков из лобби через базу данных или другой сервис
-        List<PlayerDTO> players = getPlayersFromLobby(lobbyId);
+        List<SimplePlayerDTO> players = getPlayersFromLobby(lobbyId);
 
         // Генерация начального состояния игры (раздача карт, начальные параметры)
-        GameSession gameSession = new GameSession();
-        gameSession.setLobbyId(lobbyId);
-        gameSession.setPlayers(players);
-        gameSession.initialize(); // Раздача карт и настройка параметров
+        GameSessionDTO gameSessionDTO = new GameSessionDTO();
+        gameSessionDTO.setLobbyId(lobbyId);
+        gameSessionDTO.setPlayers(players);
+        gameSessionDTO.initialize(); // Раздача карт и настройка параметров
 
         // Сохраняем сессию в базе данных
-        saveGameSession(gameSession);
+        saveGameSession(gameSessionDTO);
 
         // Уведомляем игроков через WebSocket или другой механизм
-        notifyPlayersAboutGameStart(players, gameSession);
+        notifyPlayersAboutGameStart(players, gameSessionDTO);
     }
 
-    private List<PlayerDTO> getPlayersFromLobby(Long lobbyId) {
+    private List<SimplePlayerDTO> getPlayersFromLobby(Long lobbyId) {
         // Пример: запрос через WebClient или базу данных
-        return List.of(new PlayerDTO(1L), new PlayerDTO(2L)); // Заглушка
+        return List.of(new SimplePlayerDTO(1L), new SimplePlayerDTO(2L)); // Заглушка
     }
 
-    private void saveGameSession(GameSession gameSession) {
+    private void saveGameSession(GameSessionDTO gameSessionDTO) {
         // Сохранение в базу данных через EntityManager или репозиторий
-        System.out.println("Game session saved: " + gameSession);
+        System.out.println("Game session saved: " + gameSessionDTO);
     }
 
-    private void notifyPlayersAboutGameStart(List<PlayerDTO> players, GameSession gameSession) {
-        for (PlayerDTO player : players) {
+    private void notifyPlayersAboutGameStart(List<SimplePlayerDTO> players, GameSessionDTO gameSessionDTO) {
+        for (SimplePlayerDTO player : players) {
             System.out.println("Notifying player: " + player.getId());
             // Логика уведомления игрока
         }

@@ -1,24 +1,26 @@
 package main.frame.gameservice.service;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.frame.gameservice.client.LobbyServiceClient;
+import main.frame.gameservice.dto.LobbyPlayerCardsDTO;
 import main.frame.gameservice.model.cardconfig.RestrictedCard;
 import main.frame.gameservice.model.characters.CharacterCard;
+import main.frame.gameservice.model.player.ActionType;
+import main.frame.gameservice.model.player.LobbyPlayerCards;
 import main.frame.gameservice.model.player.Player;
 import main.frame.gameservice.model.player.PlayerAction;
 import main.frame.gameservice.model.session.GamePhase;
+import main.frame.gameservice.model.session.GameSessionDTO;
 import main.frame.gameservice.model.session.GameSession;
-import main.frame.gameservice.model.session.GameSessionEntity;
 import main.frame.shared.dto.LobbyDTO;
 import main.frame.shared.dto.PlayerDTO;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,7 +30,7 @@ public class GameServiceImp implements GameService {
     @PersistenceContext
     private EntityManager entityManager;
     private final LobbyServiceClient lobbyServiceClient;
-    private final CardService cardService;
+    private final PlayerService playerService;
 
 //    public boolean tryUseCard(Player player, Card card) {
 //        if (player.canUseCard(card, cardService)) {
@@ -40,44 +42,69 @@ public class GameServiceImp implements GameService {
 //        }
 //    }
 
-    public void initializeGameSession(Long lobbyId, List<Long> playerIds) {
-        GameSessionEntity session = new GameSessionEntity();
-        session.setLobbyId(lobbyId);
+//    public void initializeGameSession(Long lobbyId, List<Long> playerIds) {
+//        GameSessionEntity session = new GameSessionEntity();
+//        session.setLobbyId(lobbyId);
+//
+//        // Установка начальной очередности игроков
+//        List<Long> shuffledOrder = new ArrayList<>(playerIds);
+//        Collections.shuffle(shuffledOrder);
+//        session.setTurnOrder(shuffledOrder);
+//
+//        session.setActivePlayerIndex(0); // Первый игрок начинает
+//        session.setTurnNumber(1); // Первый ход
+//        session.setPhase(GamePhase.START);
+//
+//        gameSessionRepository.save(session);
+//    }
 
-        // Установка начальной очередности игроков
-        List<Long> shuffledOrder = new ArrayList<>(playerIds);
-        Collections.shuffle(shuffledOrder);
-        session.setTurnOrder(shuffledOrder);
+//    public void nextTurn(Long sessionId) {
+//        GameSessionEntity session = gameSessionRepository.findById(sessionId)
+//                .orElseThrow(() -> new IllegalArgumentException("Сессия не найдена"));
+//
+//        // Переход к следующему игроку
+//        int currentIndex = session.getActivePlayerIndex();
+//        int nextIndex = (currentIndex + 1) % session.getTurnOrder().size();
+//
+//        session.setActivePlayerIndex(nextIndex);
+//        session.setTurnNumber(session.getTurnNumber() + 1);
+//
+//        // Установка фазы игры
+//        session.setPhase(GamePhase.PLAY);
+//
+//        gameSessionRepository.save(session);
+//
+//        // Уведомление игроков через WebSocket
+//        notifyPlayersAboutTurnChange(session);
+//    }
 
-        session.setActivePlayerIndex(0); // Первый игрок начинает
-        session.setTurnNumber(1); // Первый ход
-        session.setPhase(GamePhase.START);
+  //  @Transactional
+    @Override
+    public void nextTurn(Long gameSessionId) {
+        GameSession session = entityManager.find(GameSession.class, gameSessionId);
+        if (session == null) {
+            throw new EntityNotFoundException("Игровая сессия не найдена.");
+        }
 
-        gameSessionRepository.save(session);
-    }
+        // Получаем текущего игрока
+        Long currentPlayerId = session.getActivePlayerId();
+        List<Long> playerIds = new ArrayList<>(session.getPlayerHands().keySet());
 
-    public void nextTurn(Long sessionId) {
-        GameSessionEntity session = gameSessionRepository.findById(sessionId)
-                .orElseThrow(() -> new IllegalArgumentException("Сессия не найдена"));
+        // Определяем следующего игрока
+        int currentIndex = playerIds.indexOf(currentPlayerId);
+        int nextIndex = (currentIndex + 1) % playerIds.size();
+        session.setActivePlayerId(playerIds.get(nextIndex));
 
-        // Переход к следующему игроку
-        int currentIndex = session.getActivePlayerIndex();
-        int nextIndex = (currentIndex + 1) % session.getTurnOrder().size();
-
-        session.setActivePlayerIndex(nextIndex);
+        // Обновляем фазу и номер хода
         session.setTurnNumber(session.getTurnNumber() + 1);
-
-        // Установка фазы игры
         session.setPhase(GamePhase.PLAY);
 
-        gameSessionRepository.save(session);
-
-        // Уведомление игроков через WebSocket
-        notifyPlayersAboutTurnChange(session);
+        entityManager.merge(session);
     }
 
 
-    public boolean canPlayerUseCard(Player player, RestrictedCard card) {
+
+    public boolean canPlayerUseCard(LobbyPlayerCards player, RestrictedCard card) {
         Set<String> playerClasses = player.getCharacterClasses()
                 .stream()
                 .map(CharacterCard::getName)
@@ -117,30 +144,79 @@ public class GameServiceImp implements GameService {
 //        }
 //    }
 
-    public GameSession startGameSession(Long lobbyId) {
-        LobbyDTO lobby = lobbyServiceClient.getLobbyById(lobbyId)
-                .orElseThrow(() -> new IllegalArgumentException("Лобби не найдено!"));
+    @Override
+    public GameSessionDTO startGameSession(Long lobbyId) {
+        // Получение данных о лобби
+        LobbyDTO lobby = lobbyServiceClient.getLobbyById(lobbyId);
+        List<PlayerDTO> players = lobbyServiceClient.getPlayersInLobby(lobbyId).stream()
+                .map(player -> PlayerDTO.builder()
+                        .id(player.getId())
+                        .userId(null) // Если `userId` не требуется, можно оставить null
+                      //  .level(0) // Уровень не указан в LobbyService
+                        .build())
+                .toList();
 
-        GameSession session = new GameSession();
+        if (players.isEmpty()) {
+            throw new IllegalArgumentException("В лобби нет игроков: " + lobbyId);
+        }
+
+        // Создание игровой сессии
+        GameSessionDTO session = new GameSessionDTO();
         session.setLobbyId(lobbyId);
-        session.setPlayers(lobby.getPlayers());
+        session.setPlayers(players);
         session.initialize(); // Настройка начального состояния игры
 
-        saveGameSession(session); // Сохранение сессии
+        // Сохранение игровой сессии
+        saveGameSession(session);
+
         return session;
     }
 
-    public void saveGameSession(GameSession session) {
-        GameSessionEntity entity = new GameSessionEntity();
-        entity.setLobbyId(session.getLobbyId());
-        entity.setPlayers(session.getPlayers());
-        entity.setPhase(session.getPhase());
-        entity.setDeck(session.getDeck());
+   // @Transactional
+    @Override
+    public void saveGameSession(GameSessionDTO session) {
+        // Преобразование GameSession в GameSessionEntity
+        GameSession entity = GameSession.builder()
+                .lobbyId(session.getLobbyId())
+                .playerHands(session.getPlayerHands())
+              //  .deck(session.getDeck().stream().map(Card::getId).toList()) // Конвертируем карты в ID
+                .deck(session.getDeck())
+               // .discardPile(session.getDiscardPile().stream().map(Card::getId).toList()) // Тоже ID
+                .discardPile(session.getDiscardPile())
+                .phase(session.getPhase())
+                .activePlayerId(session.getActivePlayerId())
+                .turnNumber(session.getTurnNumber())
+                .build();
+
+        // Сохранение через EntityManager
         entityManager.persist(entity);
     }
 
+
+//    public GameSession startGameSession(Long lobbyId) {
+//        LobbyDTO lobby = lobbyServiceClient.getLobbyById(lobbyId)
+//                .orElseThrow(() -> new IllegalArgumentException("Лобби не найдено!"));
+//
+//        GameSession session = new GameSession();
+//        session.setLobbyId(lobbyId);
+//        session.setPlayers(lobby.getPlayers());
+//        session.initialize(); // Настройка начального состояния игры
+//
+//        saveGameSession(session); // Сохранение сессии
+//        return session;
+//    }
+//
+//    public void saveGameSession(GameSession session) {
+//        GameSessionEntity entity = new GameSessionEntity();
+//        entity.setLobbyId(session.getLobbyId());
+//        entity.setPlayers(session.getPlayers());
+//        entity.setPhase(session.getPhase());
+//        entity.setDeck(session.getDeck());
+//        entityManager.persist(entity);
+//    }
+
     public void processPlayerAction(Long sessionId, PlayerAction action) {
-        GameSession session = getGameSessionById(sessionId);
+        GameSessionDTO session = getGameSessionById(sessionId);
 
         switch (action.getType()) {
             case PLAY_CARD:
@@ -196,22 +272,30 @@ public class GameServiceImp implements GameService {
 //        notifyPlayersAboutAction(gameSession, playerId, action);
 //    }
 
-    private void validateAction(GameSessionEntity session, Long playerId, PlayerAction action) {
-        if (!session.getPlayerIds().contains(playerId)) {
+    private void validateAction(GameSession session, Long playerId, PlayerAction action) {
+        // Проверка, участвует ли игрок в сессии
+        boolean isPlayerInSession = session.getPlayers().stream()
+                .anyMatch(player -> player.getId().equals(playerId));
+
+        if (!isPlayerInSession) {
             throw new IllegalArgumentException("Игрок не участвует в этой сессии!");
         }
 
+        // Проверка, чей сейчас ход
         if (!session.getActivePlayerId().equals(playerId)) {
             throw new IllegalStateException("Сейчас не ход этого игрока!");
         }
 
-        if (action.getType() == PlayerActionType.PLAY_CARD && !session.getDeck().contains(action.getCardId())) {
+        // Проверка, может ли игрок разыграть карту
+        if (action.getType() == ActionType.PLAY_CARD &&
+                !session.getDeck().contains(action.getCardId())) {
             throw new IllegalArgumentException("Игрок не может разыграть эту карту!");
         }
     }
 
 
-    public void playCard(GameSession session, Long playerId, Long cardId) {
+
+    public void playCard(GameSessionDTO session, Long playerId, Long cardId) {
         // Логика разыгрывания карты
         System.out.println("Игрок " + playerId + " разыгрывает карту " + cardId);
         // Убрать карту из руки игрока и выполнить эффект карты
@@ -228,13 +312,13 @@ public class GameServiceImp implements GameService {
 //    }
 
 
-    public void discardCard(GameSession session, Long playerId, Long cardId) {
+    public void discardCard(GameSessionDTO session, Long playerId, Long cardId) {
         // Логика сброса карты
         System.out.println("Игрок " + playerId + " сбрасывает карту " + cardId);
         // Убрать карту из руки и добавить в сброс
     }
 
-    private void attackTarget(GameSession session, Long playerId, Long targetPlayerId) {
+    private void attackTarget(GameSessionDTO session, Long playerId, Long targetPlayerId) {
         // Логика атаки
         System.out.println("Игрок " + playerId + " атакует игрока " + targetPlayerId);
     }
@@ -253,65 +337,137 @@ public class GameServiceImp implements GameService {
 //    }
 
 
-    private void useAbility(GameSession session, Long playerId, Long abilityId) {
+    private void useAbility(GameSessionDTO session, Long playerId, Long abilityId) {
         // Логика использования способности
         System.out.println("Игрок " + playerId + " использует способность " + abilityId);
     }
 
-    public GameSession getGameSessionById(Long sessionId) {
-        GameSessionEntity entity = entityManager.find(GameSessionEntity.class, sessionId);
-        return mapEntityToSession(entity);
+    public GameSessionDTO getGameSessionById(Long sessionId) {
+        GameSession entity = entityManager.find(GameSession.class, sessionId);
+        return toGameSessionDTO(entity);
     }
 
-    public void saveGameSession(GameSession session) {
-        GameSessionEntity entity = mapSessionToEntity(session);
-        entityManager.merge(entity);
+    public GameSession getGameSessionEntityById(Long sessionId) {
+        return entityManager.find(GameSession.class, sessionId);
     }
+
+//    public void saveGameSession(GameSession session) {
+//        GameSessionEntity entity = mapSessionToEntity(session);
+//        entityManager.merge(entity);
+//    }
 
     public void nextPhase(Long gameSessionId) {
-        GameSessionEntity session = getGameSessionEntityById(gameSessionId);
+        GameSession session = getGameSessionEntityById(gameSessionId);
 
         switch (session.getPhase()) {
             case PREPARATION:
-                session.setPhase(GamePhase.ACTION);
+                session.setPhase(GamePhase.PLAY);
                 break;
-            case ACTION:
-                session.setPhase(GamePhase.RESOLUTION);
+            case PLAY:
+                session.setPhase(GamePhase.BATTLE);
                 break;
-            case RESOLUTION:
+            case BATTLE:
+                session.setPhase(GamePhase.LOOT);
+                break;
+            case LOOT:
                 session.setPhase(GamePhase.END_TURN);
                 break;
             case END_TURN:
-                startNextTurn(session);
+              //  startNextTurn(session);
+                session.setPhase(GamePhase.PLAY);
+                nextTurn(session.getId());
                 break;
+            default:
+                throw new IllegalStateException("Неизвестная фаза: " + session.getPhase());
         }
 
 
-        saveGameSession(session);
+        saveGameSessionEntity(session);
 
-        notifyPlayersAboutPhaseChange(session);
+      //  notifyPlayersAboutPhaseChange(session);
     }
 
-    private boolean checkWinCondition(GameSessionEntity session, Long playerId) {
-        Player player = getPlayerById(playerId); // Предполагаем, что есть метод получения игрока
-        return player.getLevel() >= 10; // Победа, если игрок достиг уровня 10
+    public void saveGameSessionEntity(GameSession entity) {
+        if (entity.getId() == null) {
+            // Новая сущность — сохраняем
+            entityManager.persist(entity);
+        } else {
+            // Существующая сущность — обновляем
+            entityManager.merge(entity);
+        }
     }
 
-    public void endGame(GameSessionEntity session, Long winnerId) {
-        session.setActive(false); // Завершаем сессию
-        session.setWinnerId(winnerId);
 
-        saveGameSession(session);
-
-        notifyPlayersAboutGameEnd(session);
+    private boolean checkWinCondition(GameSession session, Long playerId) {
+        return playerService.getPlayerDeckById(playerId)
+                .map(LobbyPlayerCardsDTO::getLevel) // Получаем уровень игрока
+                .filter(level -> level >= 10) // Проверяем, достиг ли уровень 10
+                .isPresent(); // Если фильтр прошёл, возвращаем true
     }
 
-    private GameSession mapEntityToSession(GameSessionEntity entity) {
-        List<PlayerDTO> players = entity.getPlayerIds().stream()
-                .map(playerId -> playerService.getPlayerById(playerId)) // Метод из PlayerService
-                .collect(Collectors.toList());
+//    Если победные условия зависят от других параметров (например, наличие эффектов или определённых карт),
+//    их можно учитывать, добавив логику в метод filter или отдельный сервис для проверки условий.
 
-        return GameSession.builder()
+    @Override
+    public void endGame(GameSession session, Long winnerId) {
+        // Завершаем сессию
+        session.setActive(false);
+
+        // Уведомляем игроков и обрабатываем победителя
+        if (winnerId != null) {
+            handleWinnerRewards(winnerId); // Начисление наград победителю
+    //        notifyPlayersAboutGameEnd(session, winnerId); // Уведомление игроков с именем победителя
+        } else {
+    //        notifyPlayersAboutGameEnd(session, null); // Уведомление без победителя
+        }
+
+//        // Преобразуем GameSession в GameSessionEntity
+//        GameSessionEntity entity = mapToEntity(session);
+
+        // Сохраняем сессию без winnerId
+        saveGameSessionEntity(session);
+    }
+
+//    private void notifyPlayersAboutGameEnd(GameSessionEntity session, Long winnerId) {
+//        String message;
+//        if (winnerId != null) {
+//            String winnerName = playerService.getById(winnerId)
+//                    .map(PlayerDTO::getName)
+//                    .orElse("Неизвестный игрок");
+//            message = "Игра завершена! Победитель: " + winnerName;
+//        } else {
+//            message = "Игра завершена!";
+//        }
+//
+//        // Уведомление игроков через WebSocket или другой механизм
+//        notificationService.notifyPlayers(session.getLobbyId(), message);
+//    }
+
+
+    private void handleWinnerRewards(Long winnerId) {
+        Optional<PlayerDTO> winner = playerService.getById(winnerId);
+        if (winner.isPresent()) {
+            PlayerDTO player = winner.get();
+          //  int currentLevel = player.getLevel();
+         //   player.setLevel(currentLevel + 1); // Пример: повышение уровня победителю
+            // Дополнительная логика наград
+
+            // Сохранение обновлённого игрока
+        //    playerService.save(player);
+        } else {
+            throw new IllegalStateException("Победитель с ID " + winnerId + " не найден!");
+        }
+    }
+
+
+
+    private GameSessionDTO toGameSessionDTO(GameSession entity) {
+        List<PlayerDTO> players = entity.getPlayers().stream()
+                .map(player -> playerService.getById(player.getId())
+                        .orElseThrow(() -> new IllegalArgumentException("Игрок с ID " + player.getId() + " не найден")))
+                .toList();
+
+        return GameSessionDTO.builder()
                 .id(entity.getId())
                 .lobbyId(entity.getLobbyId())
                 .players(players)
@@ -323,15 +479,16 @@ public class GameServiceImp implements GameService {
                 .build();
     }
 
-    private GameSessionEntity mapSessionToEntity(GameSession session) {
-        List<Long> playerIds = session.getPlayers().stream()
-                .map(PlayerDTO::getId) // Получаем ID из PlayerDTO
-                .collect(Collectors.toList());
+    private GameSession toGameSession(GameSessionDTO session) {
+        List<Player> players = session.getPlayers().stream()
+                .map(playerDTO -> playerService.getPlayerEntityById(playerDTO.getId())
+                        .orElseThrow(() -> new IllegalArgumentException("Игрок с ID " + playerDTO.getId() + " не найден")))
+                .toList();
 
-        return GameSessionEntity.builder()
+        return GameSession.builder()
                 .id(session.getId())
                 .lobbyId(session.getLobbyId())
-                .playerIds(playerIds)
+                .players(players)
                 .deck(session.getDeck())
                 .discardPile(session.getDiscardPile())
                 .activePlayerId(session.getActivePlayerId())
@@ -341,21 +498,24 @@ public class GameServiceImp implements GameService {
     }
 
 
-    private void notifyPlayersAboutAction(GameSessionEntity session, Long playerId, PlayerAction action) {
-        // Отправляем сообщение через WebSocket
-        String message = String.format("Игрок %d совершил действие: %s", playerId, action.getType());
-        webSocketService.sendMessageToLobby(session.getLobbyId(), message);
-    }
 
-    private void notifyPlayersAboutPhaseChange(GameSessionEntity session) {
-        String message = String.format("Смена фазы на %s", session.getPhase());
-        webSocketService.sendMessageToLobby(session.getLobbyId(), message);
-    }
 
-    private void notifyPlayersAboutGameEnd(GameSessionEntity session) {
-        String message = String.format("Игра завершена! Победитель: игрок %d", session.getWinnerId());
-        webSocketService.sendMessageToLobby(session.getLobbyId(), message);
-    }
+
+//    private void notifyPlayersAboutAction(GameSessionEntity session, Long playerId, PlayerAction action) {
+//        // Отправляем сообщение через WebSocket
+//        String message = String.format("Игрок %d совершил действие: %s", playerId, action.getType());
+//        webSocketService.sendMessageToLobby(session.getLobbyId(), message);
+//    }
+//
+//    private void notifyPlayersAboutPhaseChange(GameSessionEntity session) {
+//        String message = String.format("Смена фазы на %s", session.getPhase());
+//        webSocketService.sendMessageToLobby(session.getLobbyId(), message);
+//    }
+//
+//    private void notifyPlayersAboutGameEnd(GameSessionEntity session) {
+//        String message = String.format("Игра завершена! Победитель: игрок %d", session.getWinnerId());
+//        webSocketService.sendMessageToLobby(session.getLobbyId(), message);
+//    }
 
 
     // effect.getEffectType().applyEffect(effect, player);

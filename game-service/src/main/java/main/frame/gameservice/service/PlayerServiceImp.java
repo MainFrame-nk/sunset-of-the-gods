@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import main.frame.gameservice.dto.LobbyPlayerCardsDTO;
 import main.frame.shared.dto.PlayerDTO;
 import main.frame.gameservice.model.player.LobbyPlayerCards;
 import main.frame.gameservice.model.effects.Effect;
@@ -39,31 +40,49 @@ public class PlayerServiceImp implements PlayerService {
     @Override
     public Optional<PlayerDTO> getById(Long id) {
         Player player = entityManager.find(Player.class, id);
-        if (player == null) {
-            throw new UsernameNotFoundException("Игрок с id: " + id + " не найден!");
-        }
-        return Optional.of(player.toPlayerDTO()); // Обернуть результат в Optional
-    }
-    @Transactional
-    public void updateLobbyPlayerCards(Long lobbyId, Long playerId, Set<BaseCard> hand, Set<BaseCard> backpack) {
-        LobbyPlayerCards lobbyPlayerCards = lobbyPlayerCardsRepository.findByLobbyIdAndPlayerId(lobbyId, playerId)
-                .orElse(new LobbyPlayerCards());
-        lobbyPlayerCards.setLobbyId(lobbyId);
-        lobbyPlayerCards.setPlayerId(playerId);
-        lobbyPlayerCards.setHand(hand);
-        lobbyPlayerCards.setBackpack(backpack);
-        lobbyPlayerCardsRepository.save(lobbyPlayerCards);
+        return Optional.ofNullable(player)
+                .map(Player::toPlayerDTO);
     }
 
-    public LobbyPlayerCards getLobbyPlayerCards(Long lobbyId, Long playerId) {
-        return lobbyPlayerCardsRepository.findByLobbyIdAndPlayerId(lobbyId, playerId)
-                .orElseThrow(() -> new EntityNotFoundException("LobbyPlayerCards not found"));
+    @Override
+    public Optional<LobbyPlayerCardsDTO> getPlayerDeckById(Long id) {
+        LobbyPlayerCards playerDeck = entityManager.find(LobbyPlayerCards.class, id);
+        return Optional.ofNullable(playerDeck)
+                .map(LobbyPlayerCards::toLobbyPlayerCardsDTO);
     }
 
-    @Transactional
-    public void deleteLobbyPlayerCards(Long lobbyId, Long playerId) {
-        lobbyPlayerCardsRepository.deleteByLobbyIdAndPlayerId(lobbyId, playerId);
+    public LobbyPlayerCardsDTO getPlayerDeckByIdOrThrow(Long id) {
+        return getPlayerDeckById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("Стол игрока с id: " + id + " не найден!"));
     }
+
+    public Optional<Player> getPlayerEntityById(Long id) {
+        Player player = entityManager.find(Player.class, id);
+        return Optional.ofNullable(player);
+    }
+
+
+
+//    @Transactional
+//    public void updateLobbyPlayerCards(Long lobbyId, Long playerId, Set<BaseCard> hand, Set<BaseCard> backpack) {
+//        LobbyPlayerCards lobbyPlayerCards = lobbyPlayerCardsRepository.findByLobbyIdAndPlayerId(lobbyId, playerId)
+//                .orElse(new LobbyPlayerCards());
+//        lobbyPlayerCards.setLobbyId(lobbyId);
+//        lobbyPlayerCards.setPlayerId(playerId);
+//        lobbyPlayerCards.setHand(hand);
+//        lobbyPlayerCards.setBackpack(backpack);
+//        lobbyPlayerCardsRepository.save(lobbyPlayerCards);
+//    }
+
+//    public LobbyPlayerCards getLobbyPlayerCards(Long lobbyId, Long playerId) {
+//        return lobbyPlayerCardsRepository.findByLobbyIdAndPlayerId(lobbyId, playerId)
+//                .orElseThrow(() -> new EntityNotFoundException("LobbyPlayerCards not found"));
+//    }
+//
+//    @Transactional
+//    public void deleteLobbyPlayerCards(Long lobbyId, Long playerId) {
+//        lobbyPlayerCardsRepository.deleteByLobbyIdAndPlayerId(lobbyId, playerId);
+//    }
 
 
     // Обновление данных пользователя

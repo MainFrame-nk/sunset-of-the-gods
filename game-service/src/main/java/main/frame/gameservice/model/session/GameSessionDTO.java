@@ -1,14 +1,20 @@
 package main.frame.gameservice.model.session;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import main.frame.gameservice.model.cardconfig.Card;
 import main.frame.shared.dto.PlayerDTO;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Data
-public class GameSession {
+public class GameSessionDTO {
     private Long id;
     private Long lobbyId;
     private List<PlayerDTO> players;

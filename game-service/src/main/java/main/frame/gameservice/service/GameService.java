@@ -1,12 +1,14 @@
 package main.frame.gameservice.service;
 
+import main.frame.gameservice.model.session.GameSessionDTO;
 import main.frame.gameservice.model.session.GameSession;
-import main.frame.gameservice.model.session.GameSessionEntity;
 
 public interface GameService {
-    GameSession startGameSession(Long lobbyId);
-    void playCard(GameSession session, Long playerId, Long cardId);
-    void discardCard(GameSession session, Long playerId, Long cardId);
-    void saveGameSession(GameSession session);
-    void endGame(GameSessionEntity session, Long winnerId);
+    //  @Transactional
+    void nextTurn(Long gameSessionId);
+    GameSessionDTO startGameSession(Long lobbyId);
+    void playCard(GameSessionDTO session, Long playerId, Long cardId);
+    void discardCard(GameSessionDTO session, Long playerId, Long cardId);
+    void saveGameSession(GameSessionDTO session);
+    void endGame(GameSession session, Long winnerId);
 }

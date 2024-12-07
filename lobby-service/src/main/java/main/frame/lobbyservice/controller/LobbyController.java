@@ -2,6 +2,7 @@ package main.frame.lobbyservice.controller;
 
 import main.frame.lobbyservice.dto.request.JoinLobbyRequest;
 import main.frame.lobbyservice.dto.response.CreateLobbyDTO;
+import main.frame.lobbyservice.dto.response.LobbyPlayerDTO;
 import main.frame.lobbyservice.model.LobbyStatus;
 import main.frame.shared.dto.LobbyDTO;
 import main.frame.lobbyservice.model.Lobby;
@@ -89,6 +90,11 @@ public class LobbyController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Ошибка при удалении пользователя.");
         }
+    }
+
+    @GetMapping("/{id}/players")
+    public List<LobbyPlayerDTO> getPlayersInLobby(@PathVariable Long id) {
+        return lobbyService.getPlayersInLobby(id);
     }
 
 //    @PutMapping("/{id}")

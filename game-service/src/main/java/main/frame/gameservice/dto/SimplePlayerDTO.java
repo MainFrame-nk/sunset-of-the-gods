@@ -6,9 +6,8 @@ import lombok.*;
 @Data
 @Builder
 @AllArgsConstructor
-@RequiredArgsConstructor
-public class PlayerDTO {
+public class SimplePlayerDTO {
     private Long id;
-    private Long userId;
-    private int level;
+ //   private Long userId;
+ //   private int level;
 }
