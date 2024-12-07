@@ -1,14 +1,12 @@
 package main.frame.gameservice.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @NoArgsConstructor
 @Data
 @Builder
 @AllArgsConstructor
+@RequiredArgsConstructor
 public class PlayerDTO {
     private Long id;
     private Long userId;
