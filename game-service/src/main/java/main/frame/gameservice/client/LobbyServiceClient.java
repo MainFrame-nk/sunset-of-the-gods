@@ -54,8 +54,8 @@ public class LobbyServiceClient {
         return lobbyPlayers.stream()
                 .map(player -> SimplePlayerDTO.builder()
                         .id(((Number) player.get("playerId")).longValue())
-                        .turnOrder((Integer) player.get("turnOrder"))
-                        .status((String) player.get("status"))
+                    //    .turnOrder((Integer) player.get("turnOrder"))
+                 //       .status((String) player.get("status"))
                         .build())
                 .toList();
     }

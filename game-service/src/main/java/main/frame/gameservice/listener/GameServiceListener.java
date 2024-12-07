@@ -38,7 +38,7 @@ public class GameServiceListener {
         // Генерация начального состояния игры (раздача карт, начальные параметры)
         GameSessionDTO gameSessionDTO = new GameSessionDTO();
         gameSessionDTO.setLobbyId(lobbyId);
-        gameSessionDTO.setPlayers(players);
+      //  gameSessionDTO.setPlayers(players);
         gameSessionDTO.initialize(); // Раздача карт и настройка параметров
 
         // Сохраняем сессию в базе данных
