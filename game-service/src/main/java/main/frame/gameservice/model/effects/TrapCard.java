@@ -7,10 +7,10 @@ import main.frame.gameservice.model.cardconfig.BaseCard;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-@NoArgsConstructor
+//@NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "trap_cards")
+//@Table(name = "trap_cards")
 @ToString(callSuper = true) // Для добавления данных базового класса в вывод
 public class TrapCard extends BaseCard {
 //    @Column(name = "activation_condition")

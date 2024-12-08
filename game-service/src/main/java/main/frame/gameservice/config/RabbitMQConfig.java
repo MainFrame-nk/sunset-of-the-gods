@@ -18,8 +18,13 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue lobbyEventsQueue() {
-        return new Queue(LOBBY_EVENTS_QUEUE);
+        return new Queue(LOBBY_EVENTS_QUEUE, true);
     }
+
+//    @Bean
+//    public Queue gameEventsQueue() {
+//        return new Queue(GAME_EVENTS_QUEUE, true, false, false); // Durable queue, non-auto-delete
+//    }
 
     // Обменник, на который подписывается GameService
     public static final String EXCHANGE = "lobby.exchange";

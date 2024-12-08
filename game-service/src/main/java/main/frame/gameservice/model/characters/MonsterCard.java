@@ -9,7 +9,7 @@ import main.frame.gameservice.model.cardconfig.BaseCard;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "monster_cards")
+//@Table(name = "monster_cards")
 @ToString(callSuper = true) // Для добавления данных базового класса в вывод
 public class MonsterCard extends BaseCard {
     @Column(name = "level", nullable = false)

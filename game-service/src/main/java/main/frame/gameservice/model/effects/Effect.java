@@ -3,6 +3,7 @@ package main.frame.gameservice.model.effects;
 import jakarta.persistence.*;
 import lombok.*;
 import main.frame.gameservice.model.cardconfig.BaseCard;
+import main.frame.gameservice.model.player.LobbyPlayerCards;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -12,11 +13,16 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "effects")
+//@Table(name = "effects")
 public class Effect extends BaseCard {
 
 //    @Column(name = "target_type", nullable = false)
 //    private String targetType; // Цель эффекта (PLAYER, MONSTER, COMPANION и т.д.)
+// Ссылка на игрока, к которому применяется эффект
+    @ManyToOne
+    @JoinColumn(name = "player_id") // Ссылка на таблицу LobbyPlayerCards
+    private LobbyPlayerCards player;  // Это поле будет использоваться для связи с игроком
+
 
     @Enumerated(EnumType.STRING) // Хранение enum в виде строки в БД
     @Column(name = "effect_type", nullable = false)

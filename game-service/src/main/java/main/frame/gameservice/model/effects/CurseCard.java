@@ -6,10 +6,10 @@ import main.frame.gameservice.model.cardconfig.BaseCard;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-@NoArgsConstructor
+//@NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "curse_cards")
+//@Table(name = "curse_cards")
 @ToString(callSuper = true) // Для добавления данных базового класса в вывод
 public class CurseCard extends BaseCard {
 //    // Проклятие сразу применяется или активируется по событию

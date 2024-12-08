@@ -1,7 +1,6 @@
 package main.frame.authservice.config;
 
 //import main.frame.game.dto.UserDTO;
-import main.frame.authservice.model.User;
 
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;

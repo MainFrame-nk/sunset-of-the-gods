@@ -29,10 +29,10 @@ public class RabbitMQConfig {
         return new Queue(LOBBY_QUEUE);
     }
 
-//    @Bean
-//    public Queue lobbyEventsQueue() {
-//        return new Queue(LOBBY_EVENTS_QUEUE);
-//    }
+    @Bean
+    public Queue lobbyEventsQueue() {
+        return new Queue(LOBBY_EVENTS_QUEUE, true); // true для персистентности
+    }
 //
 //    @Bean
 //    public Queue playerActionsQueue() {

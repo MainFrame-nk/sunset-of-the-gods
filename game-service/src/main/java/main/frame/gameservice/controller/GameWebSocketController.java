@@ -1,6 +1,8 @@
 package main.frame.gameservice.controller;
 
+import main.frame.gameservice.dto.response.GameTurnUpdate;
 import main.frame.gameservice.service.GameService;
+
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -35,28 +37,33 @@ public class GameWebSocketController {
 //                "Игрок с ID " + request.getPlayerId() + " присоединился"
 //        );
 //    }
-    @MessageMapping("/join")
-    public void handleJoinLobby(@Payload JoinLobbyRequest request,
-                                @Header("simpSessionId") String sessionId) {
-        try {
-            // Добавляем игрока в лобби через сервис
-            LobbyPlayerDTO addedPlayer = lobbyService.joinToLobby(request);
 
-            // Отправляем обновление всем игрокам в лобби через WebSocket
-            messagingTemplate.convertAndSend(
-                    "/topic/lobby/" + request.getLobbyId(),
-                    "Игрок с ID " + addedPlayer.getPlayerId() + " присоединился"
-            );
 
-        } catch (IllegalArgumentException | IllegalStateException ex) {
-            // Отправляем клиенту ошибку, если что-то пошло не так
-            messagingTemplate.convertAndSendToUser(
-                    sessionId,
-                    "/queue/errors",
-                    ex.getMessage()
-            );
-        }
-    }
+
+//    @MessageMapping("/join")
+//    public void handleJoinLobby(@Payload JoinLobbyRequest request,
+//                                @Header("simpSessionId") String sessionId) {
+//        try {
+//            // Добавляем игрока в лобби через сервис
+//            LobbyPlayerDTO addedPlayer = lobbyService.joinToLobby(request);
+//
+//            // Отправляем обновление всем игрокам в лобби через WebSocket
+//            messagingTemplate.convertAndSend(
+//                    "/topic/lobby/" + request.getLobbyId(),
+//                    "Игрок с ID " + addedPlayer.getPlayerId() + " присоединился"
+//            );
+//
+//        } catch (IllegalArgumentException | IllegalStateException ex) {
+//            // Отправляем клиенту ошибку, если что-то пошло не так
+//            messagingTemplate.convertAndSendToUser(
+//                    sessionId,
+//                    "/queue/errors",
+//                    ex.getMessage()
+//            );
+//        }
+//    }
+
+    // Важное, нужно переделать!
 
     @MessageMapping("/game/turn")
     @SendTo("/topic/game")

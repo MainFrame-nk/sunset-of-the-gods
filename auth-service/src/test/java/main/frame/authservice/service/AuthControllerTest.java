@@ -2,7 +2,6 @@ package main.frame.authservice.service;
 
 import main.frame.authservice.controller.AuthController;
 //import main.frame.game.dto.UserDTO;
-import main.frame.authservice.model.User;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

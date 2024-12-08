@@ -2,6 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -10,12 +11,12 @@
         <module name="auth-service" />
         <module name="game-service" />
         <module name="lobby-service" />
+        <module name="api-gateway" />
         <module name="user-service" />
         <module name="eureka-srv" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="api-gateway" target="17" />
       <module name="demo" target="17" />
     </bytecodeTargetLevel>
   </component>

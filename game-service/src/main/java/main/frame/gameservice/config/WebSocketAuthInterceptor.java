@@ -1,7 +1,6 @@
 package main.frame.gameservice.config;
 
 import main.frame.gameservice.utils.JwtUtil;
-import main.frame.lobbyservice.utils.JwtUtil;
 import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;

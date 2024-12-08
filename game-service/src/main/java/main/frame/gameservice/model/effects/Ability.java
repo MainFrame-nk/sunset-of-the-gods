@@ -12,7 +12,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "abilities")
+//@Table(name = "abilities")
 public class Ability extends BaseCard {
 
     @ManyToMany(fetch = FetchType.LAZY)

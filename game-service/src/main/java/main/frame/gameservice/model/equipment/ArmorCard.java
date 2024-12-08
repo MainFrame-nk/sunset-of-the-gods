@@ -13,5 +13,5 @@ import main.frame.gameservice.model.cardconfig.BaseCard;
 //@DiscriminatorColumn(name = "type")
 public abstract class ArmorCard extends BaseCard {
     private int armorValue; // Защита от брони (бонус)
-    private int goldValue; // Цена карты (может быть 0 для бесплатных)
+  //  private int goldValue; // Цена карты (может быть 0 для бесплатных)
 }

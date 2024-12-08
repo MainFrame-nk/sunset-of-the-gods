@@ -7,9 +7,9 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
-@NoArgsConstructor
+//@NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "body_cards")
+//@Table(name = "body_cards")
 @ToString(callSuper = true) // Для добавления данных базового класса в вывод
 public class BodyCard extends ArmorCard {
     @Override

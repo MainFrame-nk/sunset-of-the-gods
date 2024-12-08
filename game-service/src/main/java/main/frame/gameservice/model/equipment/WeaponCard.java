@@ -7,7 +7,7 @@ import main.frame.gameservice.model.cardconfig.BaseCard;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
-@Table(name = "weapon_cards")
+//@Table(name = "weapon_cards")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,8 +22,8 @@ public class WeaponCard extends BaseCard {
     @Column(name = "hands")
     private byte hands; // Для одной или двух рук
 
-    @Column(name = "gold_value")
-    private int goldValue; // Цена карты (может быть 0 для бесплатных)
+//    @Column(name = "gold_value")
+//    private int goldValue; // Цена карты (может быть 0 для бесплатных)
 
     @Enumerated(EnumType.STRING) // Хранение enum в виде строки в БД
     @Column(name = "weapon_type", nullable = false)

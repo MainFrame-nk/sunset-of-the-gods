@@ -1,7 +1,6 @@
 package main.frame.authservice.service;
 
 //import main.frame.game.dto.UserDTO;
-import main.frame.authservice.model.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -18,8 +17,8 @@ public class AuthControllerRegisterTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
-    private UserService userService;
+//    @MockBean
+//    private UserService userService;
 
     @MockBean
     private AuthService authService;

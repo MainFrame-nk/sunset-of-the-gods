@@ -13,7 +13,7 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "companion_cards")
+//@Table(name = "companion_cards")
 @ToString(callSuper = true) // Для добавления данных базового класса в вывод
 public class CompanionCard extends BaseCard {
 //    @Column(name = "level")

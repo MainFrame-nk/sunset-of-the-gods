@@ -28,6 +28,13 @@ spring:
           filters:
             - StripPrefix=1
             - PreserveHostHeader=true
+        - id: game-service
+          uri: lb://game-service
+          predicates:
+            - Path=/game/**
+          filters:
+            - StripPrefix=1
+            - PreserveHostHeader=true
 server:
   port: 8080
 

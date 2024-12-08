@@ -12,10 +12,11 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@MappedSuperclass
+//@MappedSuperclass
 @Entity
-//@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+//чтобы BaseCard сохранялась как отдельная таблица, нужно удалить аннотацию @MappedSuperclass и оставить только @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+//@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @DiscriminatorColumn(name = "card_type", discriminatorType = DiscriminatorType.STRING)
 public abstract class BaseCard implements RestrictedCard {
     @Id
@@ -50,4 +51,7 @@ public abstract class BaseCard implements RestrictedCard {
             inverseJoinColumns = @JoinColumn(name = "effect_id")
     )
     private Set<Effect> effects = new HashSet<>(); // Список эффектов
+
+    @Column(name = "gold_value")
+    private int goldValue; // Цена карты (может быть 0 для бесплатных, -1 без цены)
 }

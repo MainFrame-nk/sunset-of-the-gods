@@ -1,8 +1,6 @@
 package main.frame.authservice.service;
 
 //import main.frame.game.dto.UserDTO;
-import main.frame.authservice.model.Role;
-import main.frame.authservice.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
