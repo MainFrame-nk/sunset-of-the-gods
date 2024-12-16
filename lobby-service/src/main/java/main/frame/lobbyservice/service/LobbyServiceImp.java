@@ -256,7 +256,7 @@ public class LobbyServiceImp implements LobbyService{
 
     @Transactional
     @Override
-    public void createLobby(CreateLobbyDTO createLobbyDTO) {
+    public Lobby createLobby(CreateLobbyDTO createLobbyDTO) {
         if (createLobbyDTO.getHostId() == null) {
             throw new IllegalArgumentException("Host ID обязателен для создания лобби.");
         }
@@ -276,6 +276,8 @@ public class LobbyServiceImp implements LobbyService{
         lobby.setHostId(createLobbyDTO.getHostId());
 
         entityManager.persist(lobby);
+
+        return lobby;
      //   log.info("Лобби успешно создано: {}", lobby.getName());
     }
 

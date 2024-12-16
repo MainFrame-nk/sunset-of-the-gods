@@ -1,5 +1,6 @@
 package main.frame.lobbyservice.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import main.frame.lobbyservice.dto.request.JoinLobbyRequest;
 import main.frame.lobbyservice.dto.response.CreateLobbyDTO;
 import main.frame.lobbyservice.dto.response.LobbyPlayerDTO;
@@ -10,6 +11,7 @@ import main.frame.lobbyservice.service.LobbyService;
 import main.frame.shared.dto.UserDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -41,14 +43,17 @@ public class LobbyController {
     }
 
     @PostMapping("/create")
+    @Transactional
     public ResponseEntity<String> createLobby(@RequestBody @Valid CreateLobbyDTO createLobbyDTO) {
         try {
-            lobbyService.createLobby(createLobbyDTO);
+            Lobby lobby = lobbyService.createLobby(createLobbyDTO);
+            JoinLobbyRequest request = new JoinLobbyRequest(lobby.getId(), createLobbyDTO.getHostId(), createLobbyDTO.getPassword());
+            lobbyService.joinToLobby(request);
             return ResponseEntity.status(HttpStatus.CREATED).body("Лобби успешно создано!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка при создании лобби!");
         }
-    }
+    } // Проверить
 
     @PostMapping("/{lobbyId}/join")
     public ResponseEntity<Void> joinLobby(@RequestBody JoinLobbyRequest request) {
@@ -110,4 +115,12 @@ public class LobbyController {
 //                    .body(null);
 //        }
 //    }
+
+        @GetMapping("/test")
+    public ResponseEntity<?> someEndpoint(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        System.out.println("Authorization Header: " + request);
+        // Логика обработки
+        return ResponseEntity.ok().build();
+    }
 }

@@ -115,6 +115,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+                System.out.println("РОЛИ ПОЛЬЗА: " + authorities);
+                System.out.println("ТОКЕН ПОЛЬЗА: " + authenticationToken);
             } else {
                 System.out.println("Токен недействителен: " + jwt);
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");

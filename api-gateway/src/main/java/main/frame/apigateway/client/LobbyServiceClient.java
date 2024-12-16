@@ -1,6 +1,7 @@
 package main.frame.apigateway.client;
 
 import main.frame.apigateway.dto.request.CreateLobbyRequest;
+import main.frame.apigateway.dto.request.JoinLobbyRequest;
 import main.frame.shared.dto.LobbyDTO;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.http.HttpHeaders;
@@ -33,6 +34,21 @@ public class LobbyServiceClient {
                 .bodyToMono(Void.class)  // Ожидаем пустой ответ
                 .doOnTerminate(() -> System.out.println("Лобби успешно создано"))
                 .onErrorResume(e -> Mono.empty());  // Если ошибка, вернем пустое значение
+    }
+
+    public Mono<Void> joinLobby(JoinLobbyRequest joinLobbyRequest, String token) {
+        return webClient
+                .post()
+                .uri("/{lobbyId}/join", joinLobbyRequest.getLobbyId()) // Подставляем lobbyId в URL
+                .bodyValue(joinLobbyRequest) // Передаем тело запроса
+                .headers(headers -> headers.set(HttpHeaders.AUTHORIZATION, token)) // Добавляем токен в заголовок
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, response -> {
+                    System.err.println("Ошибка при попытке войти в лобби, статус: " + response.statusCode());
+                    return Mono.error(new RuntimeException("Ошибка входа в лобби: " + response.statusCode()));
+                })
+                .bodyToMono(Void.class) // Ожидаем пустой ответ
+                .doOnTerminate(() -> System.out.println("Вход в лобби выполнен."));
     }
 
 //    public Mono<List<UserDTO>> getAllUsers(String token) {

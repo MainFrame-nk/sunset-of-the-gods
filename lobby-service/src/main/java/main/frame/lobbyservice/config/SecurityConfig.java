@@ -26,7 +26,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)  // Отключаем CSRF для REST API
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/ws/**").permitAll() // Игнорируем WebSocket-эндпоинты
-                        .requestMatchers("/lobby/**").hasAuthority("ROLE_USER") // Пример: только пользователи могут создавать лобби
+                        .requestMatchers("/lobby/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN") // Пример: только пользователи могут создавать лобби
+                       // .requestMatchers("/lobby/**").permitAll() // Пример: только пользователи могут создавать лобби
                        // .requestMatchers("/lobby/create").hasAuthority("ROLE_USER") // Пример: только пользователи могут создавать лобби
                         .requestMatchers("/static/**").permitAll()
                       //  .requestMatchers("/lobby/admin").hasAuthority("ROLE_ADMIN") // Пример: доступ только админам

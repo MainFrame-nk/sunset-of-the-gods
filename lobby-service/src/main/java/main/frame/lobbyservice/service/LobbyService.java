@@ -18,7 +18,7 @@ public interface LobbyService {
     void removePlayerFromLobby(Long lobbyId, Long playerId, Long requestorId);
     //private void transferHostToNextPlayer(Long lobbyId)
    // public void cleanupInactiveLobbies(); // Удалить неактивные лобби
-    void createLobby(CreateLobbyDTO createLobbyDTO);
+    Lobby createLobby(CreateLobbyDTO createLobbyDTO);
     boolean deleteLobby(Long lobbyId);
    // public void closeLobby(Long lobbyId);
     LobbyDTO updateLobby(Long lobbyId, Long hostId, String name, String password, int maxPlayers);
